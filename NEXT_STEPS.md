@@ -24,10 +24,11 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
 - Validasi di `lib/validations.ts`, label/tone di `lib/labels.ts`.
 - Semua page yang query DB: `export const dynamic = "force-dynamic"`.
 
-### Fase 1 sisa — Business Foundation
-1. **Settings > Business Profile** — form dari tabel `businessProfiles` (satu baris). Reuse `Field`, server action upsert.
-2. **Settings > Bank Accounts** — CRUD `businessBankAccounts`, satu `isPrimary`.
-3. **Settings > Pricing & Productivity & Numbering** — simpan ke tabel `settings` (key/value JSON).
+### ✅ Fase 1 sisa — Business Foundation (SELESAI)
+1. ✅ **Settings > Business Profile** — upsert `businessProfiles` satu baris.
+2. ✅ **Settings > Bank Accounts** — CRUD + setPrimary/delete.
+3. ✅ **Settings > Pricing & Productivity** — `settings` key/value (`lib/settings.ts`).
+   - Sisa kecil: Numbering editor & Account/ganti password (opsional, bisa nanti).
 
 ### Fase 2 — Feature Library
 4. Categories → Modules → Features CRUD (`featureCategories/Modules/Items`), layout §19 (sidebar kategori + list + drawer). Checklist & DoD per fitur.

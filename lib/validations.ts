@@ -37,6 +37,55 @@ export const clientSchema = z.object({
 });
 export type ClientInput = z.input<typeof clientSchema>;
 
+export const businessProfileSchema = z.object({
+  businessName: z.string().trim().min(1, "Nama bisnis wajib diisi"),
+  ownerName: optionalStr,
+  address: optionalStr,
+  city: optionalStr,
+  province: optionalStr,
+  postalCode: optionalStr,
+  email: z
+    .string()
+    .trim()
+    .email("Email tidak valid")
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  phone: optionalStr,
+  whatsapp: optionalStr,
+  website: optionalStr,
+  npwp: optionalStr,
+  slogan: optionalStr,
+  primaryColor: optionalStr,
+  defaultNote: optionalStr,
+  paymentTerms: optionalStr,
+  documentFooter: optionalStr,
+});
+export type BusinessProfileInput = z.input<typeof businessProfileSchema>;
+
+export const bankAccountSchema = z.object({
+  bankName: z.string().trim().min(1, "Nama bank wajib diisi"),
+  accountNumber: z.string().trim().min(1, "Nomor rekening wajib diisi"),
+  accountHolder: z.string().trim().min(1, "Nama pemilik rekening wajib diisi"),
+  branch: optionalStr,
+  isPrimary: z.coerce.boolean().default(false),
+});
+export type BankAccountInput = z.input<typeof bankAccountSchema>;
+
+export const generalSettingsSchema = z.object({
+  // Pricing (PRD §33.2)
+  hourlyRate: optionalMoney,
+  dailyRate: optionalMoney,
+  defaultTaxPercent: optionalMoney,
+  defaultDiscount: optionalMoney,
+  riskReserve: optionalMoney,
+  // Productivity (PRD §33.3 / §22)
+  maxActiveProjects: optionalMoney,
+  maxInProgressTasks: optionalMoney,
+  maxDailyFocus: optionalMoney,
+  workHoursPerDay: optionalMoney,
+});
+export type GeneralSettingsInput = z.input<typeof generalSettingsSchema>;
+
 export const projectSchema = z.object({
   name: z.string().trim().min(1, "Nama proyek wajib diisi"),
   clientId: z.string().uuid("Klien wajib dipilih"),
