@@ -30,8 +30,9 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
 3. ✅ **Settings > Pricing & Productivity** — `settings` key/value (`lib/settings.ts`).
    - Sisa kecil: Numbering editor & Account/ganti password (opsional, bisa nanti).
 
-### Fase 2 — Feature Library
-4. Categories → Modules → Features CRUD (`featureCategories/Modules/Items`), layout §19 (sidebar kategori + list + drawer). Checklist & DoD per fitur.
+### ✅ Fase 2 — Feature Library (SELESAI)
+4. ✅ Categories → Modules → Features CRUD, layout §19 (category rail + module grid). DoD per fitur (text).
+   - Sisa kecil: checklist per fitur sbagai child rows (`featureChecklists`) & dependencies — opsional, bisa saat Scope Builder.
 
 ### Fase 3 — Scope & RAB
 5. **Scope Builder** (§20 DESIGN): 3 panel desktop / stepper mobile. Snapshot fitur library → `projectFeatures` (PRD §37.1: SALIN, jangan referensi).

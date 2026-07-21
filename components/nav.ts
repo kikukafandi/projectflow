@@ -24,7 +24,7 @@ export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, enabled: true },
   { label: "Clients", href: "/clients", icon: Users, enabled: true },
   { label: "Projects", href: "/projects", icon: FolderKanban, enabled: true },
-  { label: "Feature Library", href: "/library", icon: Boxes, enabled: false },
+  { label: "Feature Library", href: "/library", icon: Boxes, enabled: true },
   { label: "RAB & Quotations", href: "/sales", icon: FileSpreadsheet, enabled: false },
   { label: "Tasks", href: "/tasks", icon: ListChecks, enabled: false },
   { label: "Invoices", href: "/invoices", icon: FileText, enabled: false },

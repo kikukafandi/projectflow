@@ -37,6 +37,49 @@ export const clientSchema = z.object({
 });
 export type ClientInput = z.input<typeof clientSchema>;
 
+const complexityEnum = z.enum(["very_low", "low", "medium", "high", "very_high"]);
+const priorityEnum = z.enum(["critical", "high", "medium", "low", "someday"]);
+
+export const categorySchema = z.object({
+  name: z.string().trim().min(1, "Nama kategori wajib diisi"),
+  isActive: z.coerce.boolean().default(true),
+});
+export type CategoryInput = z.input<typeof categorySchema>;
+
+export const moduleSchema = z.object({
+  categoryId: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  name: z.string().trim().min(1, "Nama modul wajib diisi"),
+  description: optionalStr,
+  defaultEstimateHours: optionalMoney,
+  defaultPrice: optionalMoney,
+  complexity: complexityEnum.default("medium"),
+  isActive: z.coerce.boolean().default(true),
+  notes: optionalStr,
+});
+export type ModuleInput = z.input<typeof moduleSchema>;
+
+export const featureItemSchema = z.object({
+  name: z.string().trim().min(1, "Nama fitur wajib diisi"),
+  description: optionalStr,
+  estimateHours: optionalMoney,
+  fixedPrice: optionalMoney,
+  hourlyRate: optionalMoney,
+  unit: optionalStr,
+  defaultQuantity: optionalMoney,
+  pricingMethod: z
+    .enum(["fixed", "hourly", "daily", "quantity", "complexity", "manual"])
+    .default("fixed"),
+  complexity: complexityEnum.default("medium"),
+  defaultPriority: priorityEnum.default("medium"),
+  definitionOfDone: optionalStr,
+  isActive: z.coerce.boolean().default(true),
+});
+export type FeatureItemInput = z.input<typeof featureItemSchema>;
+
 export const businessProfileSchema = z.object({
   businessName: z.string().trim().min(1, "Nama bisnis wajib diisi"),
   ownerName: optionalStr,

@@ -50,6 +50,23 @@ export const projectStatus: Record<string, { label: string; tone: Tone }> = {
   archived: { label: "Archived", tone: "gray" },
 };
 
+export const complexityLabels: Record<string, { label: string; tone: Tone }> = {
+  very_low: { label: "Very Low", tone: "gray" },
+  low: { label: "Low", tone: "green" },
+  medium: { label: "Medium", tone: "blue" },
+  high: { label: "High", tone: "orange" },
+  very_high: { label: "Very High", tone: "red" },
+};
+
+export const pricingMethodLabels: Record<string, string> = {
+  fixed: "Harga tetap",
+  hourly: "Per jam",
+  daily: "Per hari",
+  quantity: "Qty × satuan",
+  complexity: "Kompleksitas",
+  manual: "Manual",
+};
+
 export const priorityLabels: Record<string, { label: string; tone: Tone }> = {
   critical: { label: "Critical", tone: "red" },
   high: { label: "High", tone: "orange" },
