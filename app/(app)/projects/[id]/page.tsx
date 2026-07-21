@@ -18,14 +18,14 @@ import { archiveProject } from "../actions";
 
 export const dynamic = "force-dynamic";
 
-const TABS = [
-  "Overview",
-  "Scope",
-  "Tasks",
-  "RAB",
-  "Invoices",
-  "Files",
-  "Activity",
+const TABS: { label: string; href?: string }[] = [
+  { label: "Overview" },
+  { label: "Scope", href: "scope" },
+  { label: "RAB", href: "rab" },
+  { label: "Tasks" },
+  { label: "Invoices" },
+  { label: "Files" },
+  { label: "Activity" },
 ];
 
 function Row({ label, value }: { label: string; value?: string | null }) {
@@ -129,21 +129,32 @@ export default async function ProjectDetailPage({
 
       {/* Tabs — Overview active, rest arrive in later phases */}
       <div className="mt-5 flex gap-1 overflow-x-auto border-b border-line">
-        {TABS.map((t, i) => (
-          <span
-            key={t}
-            className={
-              i === 0
-                ? "border-b-2 border-primary px-3 pb-2.5 text-sm font-medium text-ink"
-                : "px-3 pb-2.5 text-sm text-ink-muted"
-            }
-          >
-            {t}
-            {i > 0 && (
+        {TABS.map((t, i) =>
+          i === 0 ? (
+            <span
+              key={t.label}
+              className="border-b-2 border-primary px-3 pb-2.5 text-sm font-medium text-ink"
+            >
+              {t.label}
+            </span>
+          ) : t.href ? (
+            <Link
+              key={t.label}
+              href={`/projects/${id}/${t.href}`}
+              className="whitespace-nowrap px-3 pb-2.5 text-sm text-ink-secondary hover:text-primary"
+            >
+              {t.label}
+            </Link>
+          ) : (
+            <span
+              key={t.label}
+              className="whitespace-nowrap px-3 pb-2.5 text-sm text-ink-muted"
+            >
+              {t.label}
               <span className="ml-1 text-[10px] text-ink-muted">soon</span>
-            )}
-          </span>
-        ))}
+            </span>
+          ),
+        )}
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">

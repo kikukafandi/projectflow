@@ -34,9 +34,10 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
 4. ✅ Categories → Modules → Features CRUD, layout §19 (category rail + module grid). DoD per fitur (text).
    - Sisa kecil: checklist per fitur sbagai child rows (`featureChecklists`) & dependencies — opsional, bisa saat Scope Builder.
 
-### Fase 3 — Scope & RAB
-5. **Scope Builder** (§20 DESIGN): 3 panel desktop / stepper mobile. Snapshot fitur library → `projectFeatures` (PRD §37.1: SALIN, jangan referensi).
-6. **RAB calc engine** — hitung subtotal/diskon/pajak/grand total DI SERVER (`rabs/rabSections/rabItems`), editor §21, ringkasan sticky.
+### ✅ Fase 3 — Scope & RAB (SELESAI)
+5. ✅ **Scope Builder** — add modul dari library (snapshot §37.1), add manual modul/fitur, edit/hapus fitur, status, ringkasan biaya. Link dari tab project.
+6. ✅ **RAB calc engine** — generate dari scope, section+item, totals dihitung DI SERVER (`lib/money.ts` `computeRabTotals`), editor + ringkasan sticky, diskon/pajak/biaya tambahan.
+   - Sisa: spreadsheet export (ExcelJS) & PDF → Fase 7. Revisi/versi RAB opsional.
 
 ### Fase 4 — Quotation
 7. Quotation dari RAB, payment terms (validasi total = 100% / grand total), revisi (nomor -R1), approval manual mengunci versi (PRD §37.2).

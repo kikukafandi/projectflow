@@ -129,6 +129,42 @@ export const generalSettingsSchema = z.object({
 });
 export type GeneralSettingsInput = z.input<typeof generalSettingsSchema>;
 
+export const scopeFeatureSchema = z.object({
+  name: z.string().trim().min(1, "Nama fitur wajib diisi"),
+  description: optionalStr,
+  quantity: optionalMoney,
+  unit: optionalStr,
+  estimateHours: optionalMoney,
+  unitPrice: optionalMoney,
+  complexity: complexityEnum.default("medium"),
+  status: z
+    .enum(["draft", "included", "optional", "excluded", "approved", "cancelled"])
+    .default("included"),
+  notes: optionalStr,
+});
+export type ScopeFeatureInput = z.input<typeof scopeFeatureSchema>;
+
+export const rabMetaSchema = z.object({
+  title: optionalStr,
+  discount: optionalMoney,
+  taxPercent: optionalMoney,
+  additionalCost: optionalMoney,
+  notes: optionalStr,
+});
+export type RabMetaInput = z.input<typeof rabMetaSchema>;
+
+export const rabItemSchema = z.object({
+  name: z.string().trim().min(1, "Nama pekerjaan wajib diisi"),
+  description: optionalStr,
+  quantity: optionalMoney,
+  unit: optionalStr,
+  unitPrice: optionalMoney,
+  weight: optionalMoney,
+  estimateHours: optionalMoney,
+  notes: optionalStr,
+});
+export type RabItemInput = z.input<typeof rabItemSchema>;
+
 export const projectSchema = z.object({
   name: z.string().trim().min(1, "Nama proyek wajib diisi"),
   clientId: z.string().uuid("Klien wajib dipilih"),

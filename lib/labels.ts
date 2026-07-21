@@ -50,6 +50,22 @@ export const projectStatus: Record<string, { label: string; tone: Tone }> = {
   archived: { label: "Archived", tone: "gray" },
 };
 
+export const scopeStatus: Record<string, { label: string; tone: Tone }> = {
+  draft: { label: "Draft", tone: "gray" },
+  included: { label: "Included", tone: "green" },
+  optional: { label: "Optional", tone: "orange" },
+  excluded: { label: "Excluded", tone: "gray" },
+  approved: { label: "Approved", tone: "green" },
+  cancelled: { label: "Cancelled", tone: "red" },
+};
+
+export const rabStatus: Record<string, { label: string; tone: Tone }> = {
+  draft: { label: "Draft", tone: "gray" },
+  final: { label: "Final", tone: "green" },
+  archived: { label: "Archived", tone: "gray" },
+  cancelled: { label: "Cancelled", tone: "red" },
+};
+
 export const complexityLabels: Record<string, { label: string; tone: Tone }> = {
   very_low: { label: "Very Low", tone: "gray" },
   low: { label: "Low", tone: "green" },
