@@ -108,6 +108,30 @@ export const paymentTermTypeLabels: Record<string, string> = {
   fixed: "Nominal tetap",
 };
 
+export const invoiceStatus: Record<string, { label: string; tone: Tone }> = {
+  draft: { label: "Draft", tone: "gray" },
+  sent: { label: "Sent", tone: "blue" },
+  partially_paid: { label: "Partially Paid", tone: "yellow" },
+  paid: { label: "Paid", tone: "green" },
+  overdue: { label: "Overdue", tone: "red" },
+  cancelled: { label: "Cancelled", tone: "gray" },
+  void: { label: "Void", tone: "red" },
+};
+
+export const paymentMethodLabels: Record<string, string> = {
+  transfer: "Transfer Bank",
+  cash: "Tunai",
+  qris: "QRIS",
+  ewallet: "E-wallet",
+  gateway: "Payment Gateway",
+  other: "Lainnya",
+};
+
+export const receiptStatus: Record<string, { label: string; tone: Tone }> = {
+  issued: { label: "Terbit", tone: "green" },
+  void: { label: "Void", tone: "red" },
+};
+
 export const complexityLabels: Record<string, { label: string; tone: Tone }> = {
   very_low: { label: "Very Low", tone: "gray" },
   low: { label: "Low", tone: "green" },

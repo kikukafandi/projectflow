@@ -21,6 +21,8 @@ export const config = {
     "/projects/:path*",
     "/library/:path*",
     "/focus/:path*",
+    "/invoices/:path*",
+    "/payments/:path*",
     "/settings/:path*",
   ],
 };

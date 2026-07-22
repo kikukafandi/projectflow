@@ -29,8 +29,8 @@ export const navItems: NavItem[] = [
   { label: "Feature Library", href: "/library", icon: Boxes, enabled: true },
   { label: "RAB & Quotations", href: "/sales", icon: FileSpreadsheet, enabled: false },
   { label: "Tasks", href: "/tasks", icon: ListChecks, enabled: false },
-  { label: "Invoices", href: "/invoices", icon: FileText, enabled: false },
-  { label: "Payments", href: "/payments", icon: Wallet, enabled: false },
+  { label: "Invoices", href: "/invoices", icon: FileText, enabled: true },
+  { label: "Payments", href: "/payments", icon: Wallet, enabled: true },
   { label: "Documents", href: "/documents", icon: Receipt, enabled: false },
   { label: "Settings", href: "/settings", icon: Settings, enabled: true },
 ];

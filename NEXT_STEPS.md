@@ -48,9 +48,10 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
 9. ✅ Priority Score (`lib/priority.ts`, §21.3 + level), WIP Limit (§22, default 2, override + alasan → activity log), Daily Focus global (§23, max 3, rekomendasi by skor).
    - Sisa: task dependencies UI (tabel sudah ada), global task board lintas proyek — opsional.
 
-### Fase 6 — Finance
-10. Invoice dari quotation/termin, partial invoice, status otomatis dari pembayaran.
-11. Payment tracking (kurangi sisa tagihan, transaction untuk nominal), Receipt/kuitansi + terbilang otomatis.
+### ✅ Fase 6 — Finance (SELESAI)
+10. ✅ Invoice dari quotation (full) & per-termin (partial, `invoices.paymentTermId`, term → status `invoiced`, dilepas lagi saat invoice dihapus), invoice manual, item CRUD, status otomatis dari pembayaran (`recomputeInvoice`: paid/partially_paid/overdue/sent).
+11. ✅ Payment tracking (confirm/cancel, sisa tagihan di ringkasan), Receipt/kuitansi 1:1 per payment + terbilang otomatis (`lib/terbilang.ts`), kuitansi void saat payment dibatalkan. Halaman `/payments` lintas invoice.
+   - Sisa: PDF export → Fase 7.
 
 ### Fase 7 — Dashboard & Polishing + PDF
 12. PDF generator (HTML template + print stylesheet, server-side) untuk RAB/Quotation/Invoice/Kuitansi — PRD §27.

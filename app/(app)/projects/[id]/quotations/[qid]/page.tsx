@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Copy,
+  FileText,
   Plus,
   Trash2,
 } from "lucide-react";
@@ -11,6 +12,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
 import {
+  invoices,
   paymentTerms,
   quotationItems,
   quotationSections,
@@ -32,6 +34,10 @@ import {
   setQuotationStatus,
   updateQuotationMeta,
 } from "../actions";
+import {
+  createInvoiceFromQuotation,
+  createInvoiceFromTerm,
+} from "@/app/(app)/invoices/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -73,6 +79,17 @@ export default async function QuotationEditorPage({
     .where(eq(paymentTerms.quotationId, qid))
     .orderBy(asc(paymentTerms.position), asc(paymentTerms.createdAt));
 
+  const invoiceRows = await db
+    .select({
+      id: invoices.id,
+      number: invoices.number,
+      paymentTermId: invoices.paymentTermId,
+    })
+    .from(invoices)
+    .where(eq(invoices.quotationId, qid));
+  const invoiceOfTerm = (termId: string) =>
+    invoiceRows.find((i) => i.paymentTermId === termId);
+
   const approved = q.status === "approved";
   const grand = toNum(q.grandTotal);
   const termsTotal = terms.reduce((s, t) => s + toNum(t.amount), 0);
@@ -95,6 +112,14 @@ export default async function QuotationEditorPage({
         description={`Versi ${q.currentVersion}`}
         actions={
           <>
+            {approved && terms.length === 0 && invoiceRows.length === 0 && (
+              <form action={createInvoiceFromQuotation}>
+                <input type="hidden" name="quotationId" value={qid} />
+                <Button type="submit">
+                  <FileText /> Buat Invoice
+                </Button>
+              </form>
+            )}
             <form action={reviseQuotation.bind(null, id, qid)}>
               <Button type="submit" variant="secondary">
                 <Copy /> Revisi
@@ -177,30 +202,50 @@ export default async function QuotationEditorPage({
                 <p className="text-[13px] text-ink-muted">Belum ada termin.</p>
               ) : (
                 <ul className="divide-y divide-line">
-                  {terms.map((t) => (
-                    <li key={t.id} className="flex items-center justify-between gap-2 py-2">
-                      <div>
-                        <div className="text-sm text-ink">
-                          {t.name}
-                          <span className="ml-2 text-[12px] text-ink-muted">
-                            {paymentTermTypeLabels[t.type]}
-                            {t.percent ? ` · ${Number(t.percent)}%` : ""}
-                          </span>
+                  {terms.map((t) => {
+                    const inv = invoiceOfTerm(t.id);
+                    return (
+                      <li key={t.id} className="flex items-center justify-between gap-2 py-2">
+                        <div>
+                          <div className="text-sm text-ink">
+                            {t.name}
+                            <span className="ml-2 text-[12px] text-ink-muted">
+                              {paymentTermTypeLabels[t.type]}
+                              {t.percent ? ` · ${Number(t.percent)}%` : ""}
+                            </span>
+                          </div>
+                          {t.trigger && (
+                            <div className="text-[12px] text-ink-muted">{t.trigger}</div>
+                          )}
+                          {inv && (
+                            <Link
+                              href={`/invoices/${inv.id}`}
+                              className="inline-flex items-center gap-1 text-[12px] text-primary hover:underline"
+                            >
+                              <FileText className="size-3.5" /> {inv.number}
+                            </Link>
+                          )}
                         </div>
-                        {t.trigger && (
-                          <div className="text-[12px] text-ink-muted">{t.trigger}</div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="tabular text-sm">{formatIDR(t.amount)}</span>
-                        <form action={deletePaymentTerm.bind(null, id, qid, t.id)}>
-                          <button type="submit" aria-label="Hapus termin" className="text-danger hover:text-danger">
-                            <Trash2 className="size-4" />
-                          </button>
-                        </form>
-                      </div>
-                    </li>
-                  ))}
+                        <div className="flex items-center gap-2">
+                          <span className="tabular text-sm">{formatIDR(t.amount)}</span>
+                          {approved && !inv && (
+                            <form action={createInvoiceFromTerm.bind(null, id, qid, t.id)}>
+                              <Button type="submit" size="sm" variant="secondary">
+                                <FileText className="size-4" /> Invoice
+                              </Button>
+                            </form>
+                          )}
+                          {!inv && (
+                            <form action={deletePaymentTerm.bind(null, id, qid, t.id)}>
+                              <button type="submit" aria-label="Hapus termin" className="text-danger hover:text-danger">
+                                <Trash2 className="size-4" />
+                              </button>
+                            </form>
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
               {terms.length > 0 && (

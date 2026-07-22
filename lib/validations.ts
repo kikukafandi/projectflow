@@ -117,6 +117,49 @@ export const priorityFactorsSchema = z.object({
 });
 export type PriorityFactorsInput = z.input<typeof priorityFactorsSchema>;
 
+export const invoiceMetaSchema = z.object({
+  issueDate: optionalStr,
+  dueDate: optionalStr,
+  discount: optionalMoney,
+  taxPercent: optionalMoney,
+  bankAccountId: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  notes: optionalStr,
+});
+export type InvoiceMetaInput = z.input<typeof invoiceMetaSchema>;
+
+export const invoiceItemSchema = z.object({
+  name: z.string().trim().min(1, "Nama item wajib diisi"),
+  description: optionalStr,
+  quantity: optionalMoney,
+  unit: optionalStr,
+  unitPrice: optionalMoney,
+});
+export type InvoiceItemInput = z.input<typeof invoiceItemSchema>;
+
+export const paymentSchema = z.object({
+  amount: z
+    .string()
+    .trim()
+    .min(1, "Nominal wajib diisi")
+    .refine((v) => Number(v) > 0, "Nominal harus lebih dari 0"),
+  paidAt: z.string().trim().min(1, "Tanggal wajib diisi"),
+  method: z
+    .enum(["transfer", "cash", "qris", "ewallet", "gateway", "other"])
+    .default("transfer"),
+  bankAccountId: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  reference: optionalStr,
+  notes: optionalStr,
+});
+export type PaymentInput = z.input<typeof paymentSchema>;
+
 export const businessProfileSchema = z.object({
   businessName: z.string().trim().min(1, "Nama bisnis wajib diisi"),
   ownerName: optionalStr,
