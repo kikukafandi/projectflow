@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { Archive, Pencil } from "lucide-react";
+import { Archive, ArchiveRestore, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
@@ -14,7 +14,7 @@ import {
   projectTypeLabels,
 } from "@/lib/labels";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { archiveProject } from "../actions";
+import { archiveProject, deleteProject, unarchiveProject } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -40,8 +40,10 @@ function Row({ label, value }: { label: string; value?: string | null }) {
 
 export default async function ProjectDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ archived?: string }>;
 }) {
   const { id } = await params;
   const [row] = await db
@@ -51,7 +53,9 @@ export default async function ProjectDetailPage({
     .where(eq(projects.id, id));
   if (!row) notFound();
   const p = row.project;
+  const { archived } = await searchParams;
   const archive = archiveProject.bind(null, id);
+  const isArchived = p.status === "archived";
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -65,16 +69,39 @@ export default async function ProjectDetailPage({
                 <Pencil /> Edit
               </Link>
             </Button>
-            {p.status !== "archived" && (
+            {isArchived ? (
+              <form action={unarchiveProject.bind(null, id)}>
+                <Button type="submit" variant="secondary">
+                  <ArchiveRestore /> Kembalikan
+                </Button>
+              </form>
+            ) : (
               <form action={archive}>
                 <Button type="submit" variant="ghost">
                   <Archive /> Arsipkan
                 </Button>
               </form>
             )}
+            <form action={deleteProject.bind(null, id)}>
+              <Button
+                type="submit"
+                variant="ghost"
+                className="text-danger hover:bg-danger-soft"
+              >
+                <Trash2 /> Hapus
+              </Button>
+            </form>
           </>
         }
       />
+
+      {archived && (
+        <div className="mb-3 rounded-[12px] bg-warning-soft px-3 py-2 text-[13px] text-[#a9760f]">
+          Proyek ini punya invoice, jadi tidak dihapus permanen — statusnya
+          diarsipkan (PRD §37.7). Hapus dulu invoice-nya kalau memang ingin
+          membuang datanya.
+        </div>
+      )}
 
       {/* Project header card (DESIGN.MD §18) */}
       <Card>

@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { Archive, FolderKanban, Pencil } from "lucide-react";
+import { Archive, ArchiveRestore, FolderKanban, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
@@ -14,7 +14,7 @@ import {
   projectStatus,
 } from "@/lib/labels";
 import { formatIDR } from "@/lib/utils";
-import { archiveClient } from "../actions";
+import { archiveClient, deleteClient, unarchiveClient } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -29,10 +29,13 @@ function Row({ label, value }: { label: string; value?: string | null }) {
 
 export default async function ClientDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ archived?: string }>;
 }) {
   const { id } = await params;
+  const { archived } = await searchParams;
   const [client] = await db.select().from(clients).where(eq(clients.id, id));
   if (!client) notFound();
 
@@ -43,6 +46,7 @@ export default async function ClientDetailPage({
     .orderBy(desc(projects.createdAt));
 
   const archive = archiveClient.bind(null, id);
+  const isArchived = client.status === "archived";
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -56,16 +60,39 @@ export default async function ClientDetailPage({
                 <Pencil /> Edit
               </Link>
             </Button>
-            {client.status !== "archived" && (
+            {isArchived ? (
+              <form action={unarchiveClient.bind(null, id)}>
+                <Button type="submit" variant="secondary">
+                  <ArchiveRestore /> Kembalikan
+                </Button>
+              </form>
+            ) : (
               <form action={archive}>
                 <Button type="submit" variant="ghost">
                   <Archive /> Arsipkan
                 </Button>
               </form>
             )}
+            <form action={deleteClient.bind(null, id)}>
+              <Button
+                type="submit"
+                variant="ghost"
+                className="text-danger hover:bg-danger-soft"
+              >
+                <Trash2 /> Hapus
+              </Button>
+            </form>
           </>
         }
       />
+
+      {archived && (
+        <div className="mb-3 rounded-[12px] bg-warning-soft px-3 py-2 text-[13px] text-[#a9760f]">
+          Klien ini punya proyek atau invoice, jadi tidak dihapus permanen —
+          statusnya diarsipkan (PRD §37.7). Hapus dulu proyek/invoice-nya kalau
+          memang ingin membuang datanya.
+        </div>
+      )}
 
       <div className="mb-3 flex items-center gap-2">
         <StatusBadge map={clientStatus} value={client.status} />

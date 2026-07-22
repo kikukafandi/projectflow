@@ -1,10 +1,10 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { projects } from "@/db/schema";
+import { invoices, projects } from "@/db/schema";
 import { logActivity } from "@/lib/activity";
 import { nextDocumentNumber } from "@/lib/numbering";
 import { requireUser } from "@/lib/session";
@@ -87,6 +87,57 @@ export async function archiveProject(id: string): Promise<void> {
   await logActivity({
     userId: user.id,
     action: "project.archived",
+    entityType: "project",
+    entityId: id,
+  });
+  revalidatePath("/projects");
+  redirect("/projects");
+}
+
+export async function unarchiveProject(id: string): Promise<void> {
+  const user = await requireUser();
+  await db
+    .update(projects)
+    // The pre-archive status isn't stored, so restore to "draft" and let the
+    // user set the real one — never guess a status that drives billing.
+    .set({ status: "draft", archivedAt: null, updatedAt: new Date() })
+    .where(eq(projects.id, id));
+  await logActivity({
+    userId: user.id,
+    action: "project.unarchived",
+    entityType: "project",
+    entityId: id,
+  });
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${id}`);
+}
+
+/**
+ * Hard delete, for clearing out trial data. Scope, RAB, quotation, task, and
+ * phase rows cascade with the project. Invoices do not — their FK is
+ * `set null`, so deleting would orphan financial records; a project with any
+ * invoice is archived instead (PRD §37.7).
+ */
+export async function deleteProject(id: string): Promise<void> {
+  const user = await requireUser();
+  const [{ n: invoiceCount }] = await db
+    .select({ n: count() })
+    .from(invoices)
+    .where(eq(invoices.projectId, id));
+
+  if (invoiceCount > 0) {
+    await db
+      .update(projects)
+      .set({ status: "archived", archivedAt: new Date(), updatedAt: new Date() })
+      .where(eq(projects.id, id));
+    revalidatePath("/projects");
+    redirect(`/projects/${id}?archived=1`);
+  }
+
+  await db.delete(projects).where(eq(projects.id, id));
+  await logActivity({
+    userId: user.id,
+    action: "project.deleted",
     entityType: "project",
     entityId: id,
   });

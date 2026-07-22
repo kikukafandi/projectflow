@@ -161,6 +161,8 @@ export const priorityLabels: Record<string, { label: string; tone: Tone }> = {
 const activityLabels: Record<string, string> = {
   "business_profile.saved": "Profil bisnis disimpan",
   "client.archived": "Klien diarsipkan",
+  "client.deleted": "Klien dihapus",
+  "client.unarchived": "Klien dikembalikan dari arsip",
   "client.created": "Klien dibuat",
   "client.updated": "Klien diperbarui",
   "invoice.created": "Invoice dibuat",
@@ -168,6 +170,8 @@ const activityLabels: Record<string, string> = {
   "payment.cancelled": "Pembayaran dibatalkan",
   "payment.recorded": "Pembayaran dicatat",
   "project.archived": "Proyek diarsipkan",
+  "project.deleted": "Proyek dihapus",
+  "project.unarchived": "Proyek dikembalikan dari arsip",
   "project.created": "Proyek dibuat",
   "project.updated": "Proyek diperbarui",
   "quotation.approved": "Quotation disetujui",
