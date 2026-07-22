@@ -7,7 +7,10 @@ export function toNum(v: string | number | null | undefined): number {
 }
 
 export type RabTotalsInput = {
-  items: { quantity: string | number | null; unitPrice: string | number | null }[];
+  items: {
+    quantity?: string | number | null;
+    unitPrice?: string | number | null;
+  }[];
   discount?: string | number | null;
   taxPercent?: string | number | null;
   additionalCost?: string | number | null;

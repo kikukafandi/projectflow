@@ -1,5 +1,5 @@
 import { asc, eq, inArray } from "drizzle-orm";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Printer, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
@@ -66,11 +66,18 @@ export default async function RabEditorPage({
         title={rab.number}
         description={rab.title ?? undefined}
         actions={
-          <form action={deleteRab.bind(null, id, rabId)}>
-            <Button type="submit" variant="ghost" className="text-danger hover:bg-danger-soft">
-              <Trash2 /> Hapus
+          <>
+            <Button asChild variant="secondary">
+              <Link href={`/print/rab/${rabId}?back=/projects/${id}/rab/${rabId}`}>
+                <Printer /> Cetak
+              </Link>
             </Button>
-          </form>
+            <form action={deleteRab.bind(null, id, rabId)}>
+              <Button type="submit" variant="ghost" className="text-danger hover:bg-danger-soft">
+                <Trash2 /> Hapus
+              </Button>
+            </form>
+          </>
         }
       />
 

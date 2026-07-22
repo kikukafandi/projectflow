@@ -24,5 +24,9 @@ export const config = {
     "/invoices/:path*",
     "/payments/:path*",
     "/settings/:path*",
+    "/print/:path*",
+    "/activity/:path*",
+    "/search/:path*",
+    "/notifications/:path*",
   ],
 };

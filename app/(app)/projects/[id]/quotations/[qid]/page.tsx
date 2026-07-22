@@ -6,6 +6,7 @@ import {
   Copy,
   FileText,
   Plus,
+  Printer,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
@@ -112,6 +113,11 @@ export default async function QuotationEditorPage({
         description={`Versi ${q.currentVersion}`}
         actions={
           <>
+            <Button asChild variant="secondary">
+              <Link href={`/print/quotation/${qid}?back=/projects/${id}/quotations/${qid}`}>
+                <Printer /> Cetak
+              </Link>
+            </Button>
             {approved && terms.length === 0 && invoiceRows.length === 0 && (
               <form action={createInvoiceFromQuotation}>
                 <input type="hidden" name="quotationId" value={qid} />

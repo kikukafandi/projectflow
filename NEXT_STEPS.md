@@ -53,9 +53,14 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
 11. ✅ Payment tracking (confirm/cancel, sisa tagihan di ringkasan), Receipt/kuitansi 1:1 per payment + terbilang otomatis (`lib/terbilang.ts`), kuitansi void saat payment dibatalkan. Halaman `/payments` lintas invoice.
    - Sisa: PDF export → Fase 7.
 
-### Fase 7 — Dashboard & Polishing + PDF
-12. PDF generator (HTML template + print stylesheet, server-side) untuk RAB/Quotation/Invoice/Kuitansi — PRD §27.
-13. Notification internal, Global search, Activity Log page, Vercel Blob file upload.
+### ✅ Fase 7 — Dashboard & Polishing + PDF (SELESAI)
+12. ✅ **Document generator** — satu route `/print/[docType]/[id]` (rab | quotation | invoice | receipt) di route group `(print)` tanpa AppShell, `lib/documents.ts` menormalkan keempat dokumen ke satu bentuk, `components/document-paper.tsx` merender sheet A4 memakai business profile (logo/warna/tanda tangan/stempel/footer), print stylesheet `@media print` + `@page A4` di `globals.css`. Tombol Cetak di halaman RAB, Quotation, Invoice, dan tiap kuitansi.
+    - PDF dihasilkan lewat print-to-PDF browser (PRD §27.4). Renderer headless (Puppeteer) adalah jalur upgrade kalau file PDF harus disimpan/dikirim tanpa klik manual.
+13. ✅ **Notification internal** (`lib/notifications.ts`, diturunkan saat halaman dibuka — idempoten, tanpa cron): task overdue/due-soon/blocked, WIP limit, quotation hampir kedaluwarsa, invoice due/overdue, proyek tanpa aktivitas 14 hari. Bisa ditandai dibaca (satuan/semua), punya urgensi, dan membuka data terkait. Badge unread di header.
+    ✅ **Global search** `/search` — klien, proyek, task, feature library, quotation, invoice (`ilike`, case-insensitive). Kotak cari di header aktif.
+    ✅ **Activity Log page** `/activity` dengan pagination 50/halaman + label aksi di `lib/labels.ts`.
+    - Sisa: **Vercel Blob upload dilewati** — butuh `@vercel/blob` + `BLOB_READ_WRITE_TOKEN` yang belum ada, jadi tidak bisa diverifikasi. Sebagai gantinya logo/tanda tangan/stempel diisi via URL di Business Profile, cukup untuk dokumen. Tambahkan upload saat token tersedia.
+    - Sisa: spreadsheet export RAB (ExcelJS) — belum dikerjakan.
 
 ## Perintah verifikasi
 ```bash

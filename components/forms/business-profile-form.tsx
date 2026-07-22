@@ -116,6 +116,15 @@ export function BusinessProfileForm({
       <Card>
         <CardContent className="grid gap-4">
           <CardTitle>Default Dokumen</CardTitle>
+          <Field label="URL Logo" htmlFor="logoUrl" hint="Tampil di header dokumen.">
+            <Input id="logoUrl" placeholder="https://…" {...register("logoUrl")} />
+          </Field>
+          <Field label="URL Tanda Tangan" htmlFor="signatureUrl">
+            <Input id="signatureUrl" placeholder="https://…" {...register("signatureUrl")} />
+          </Field>
+          <Field label="URL Stempel" htmlFor="stampUrl">
+            <Input id="stampUrl" placeholder="https://…" {...register("stampUrl")} />
+          </Field>
           <Field label="Catatan Default" htmlFor="defaultNote">
             <Textarea id="defaultNote" {...register("defaultNote")} />
           </Field>

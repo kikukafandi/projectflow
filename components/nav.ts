@@ -2,6 +2,7 @@ import {
   Boxes,
   CalendarCheck,
   FileText,
+  History,
   LayoutDashboard,
   ListChecks,
   Receipt,
@@ -32,6 +33,7 @@ export const navItems: NavItem[] = [
   { label: "Invoices", href: "/invoices", icon: FileText, enabled: true },
   { label: "Payments", href: "/payments", icon: Wallet, enabled: true },
   { label: "Documents", href: "/documents", icon: Receipt, enabled: false },
+  { label: "Activity Log", href: "/activity", icon: History, enabled: true },
   { label: "Settings", href: "/settings", icon: Settings, enabled: true },
 ];
 

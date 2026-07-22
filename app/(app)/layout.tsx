@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/app-shell";
+import { unreadCount } from "@/lib/notifications";
 import { requireUser } from "@/lib/session";
 
 export default async function AppLayout({
@@ -7,5 +8,10 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
-  return <AppShell user={user}>{children}</AppShell>;
+  const unread = await unreadCount();
+  return (
+    <AppShell user={user} unreadCount={unread}>
+      {children}
+    </AppShell>
+  );
 }

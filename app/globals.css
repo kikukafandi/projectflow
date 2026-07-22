@@ -72,3 +72,43 @@ body {
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/* A4 document sheet + print stylesheet (PRD §27). */
+.doc-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 16mm 15mm;
+  box-shadow: var(--shadow-lg);
+  border-radius: 4px;
+}
+
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+  .doc-sheet {
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  /* Keep table headers on every page and never split a row. */
+  thead {
+    display: table-header-group;
+  }
+  tr,
+  img {
+    break-inside: avoid;
+  }
+  /* Force accent fills and tinted rows to actually ink. */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

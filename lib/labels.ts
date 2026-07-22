@@ -156,3 +156,51 @@ export const priorityLabels: Record<string, { label: string; tone: Tone }> = {
   low: { label: "Low", tone: "gray" },
   someday: { label: "Someday", tone: "gray" },
 };
+
+/** Human label for an activity-log action (PRD §32.2). */
+const activityLabels: Record<string, string> = {
+  "business_profile.saved": "Profil bisnis disimpan",
+  "client.archived": "Klien diarsipkan",
+  "client.created": "Klien dibuat",
+  "client.updated": "Klien diperbarui",
+  "invoice.created": "Invoice dibuat",
+  "payment.cancelled": "Pembayaran dibatalkan",
+  "payment.recorded": "Pembayaran dicatat",
+  "project.archived": "Proyek diarsipkan",
+  "project.created": "Proyek dibuat",
+  "project.updated": "Proyek diperbarui",
+  "quotation.approved": "Quotation disetujui",
+  "quotation.generated": "Quotation dibuat dari RAB",
+  "rab.generated": "RAB dibuat dari scope",
+  "receipt.created": "Kuitansi diterbitkan",
+  "scope.module_added": "Modul ditambahkan ke scope",
+  "task.done": "Task diselesaikan",
+  "tasks.generated": "Task dibuat dari scope",
+  "wip.override": "WIP limit ditembus",
+};
+
+export function activityLabel(action: string): string {
+  return activityLabels[action] ?? action;
+}
+
+/**
+ * Route for an entity referenced by a log/notification. Returns null for types
+ * whose route needs a parent id (task, quotation) — those are resolved by the
+ * caller that already knows the project.
+ */
+export function entityHref(
+  entityType: string | null,
+  entityId: string | null,
+): string | null {
+  if (!entityId) return null;
+  switch (entityType) {
+    case "client":
+      return `/clients/${entityId}`;
+    case "project":
+      return `/projects/${entityId}`;
+    case "invoice":
+      return `/invoices/${entityId}`;
+    default:
+      return null;
+  }
+}

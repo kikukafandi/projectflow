@@ -11,9 +11,11 @@ import { bottomNavHrefs, navItems } from "./nav";
 
 export function AppShell({
   user,
+  unreadCount = 0,
   children,
 }: {
   user: { name?: string | null; email?: string | null };
+  unreadCount?: number;
   children: React.ReactNode;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -50,19 +52,35 @@ export function AppShell({
           </span>
 
           <div className="ml-auto flex items-center gap-2">
-            <div className="hidden items-center gap-2 rounded-[12px] border border-line bg-surface px-3 md:flex">
+            <form
+              action="/search"
+              method="get"
+              className="hidden items-center gap-2 rounded-[12px] border border-line bg-surface px-3 md:flex"
+            >
               <Search className="size-4 text-ink-muted" />
               <input
+                name="q"
                 placeholder="Cari…"
+                aria-label="Cari"
                 className="h-[38px] w-40 bg-transparent text-sm outline-none placeholder:text-ink-muted lg:w-56"
               />
-            </div>
-            <button
-              aria-label="Notifikasi"
-              className="flex size-10 items-center justify-center rounded-[10px] text-ink-secondary hover:bg-surface-muted"
+            </form>
+            <Link
+              href="/notifications"
+              aria-label={
+                unreadCount > 0
+                  ? `Notifikasi (${unreadCount} belum dibaca)`
+                  : "Notifikasi"
+              }
+              className="relative flex size-10 items-center justify-center rounded-[10px] text-ink-secondary hover:bg-surface-muted"
             >
               <Bell className="size-5" />
-            </button>
+              {unreadCount > 0 && (
+                <span className="absolute right-1.5 top-1.5 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold leading-4 text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </Link>
             <div className="hidden items-center gap-2 rounded-full bg-surface py-1 pl-1 pr-3 md:flex">
               <span className="flex size-8 items-center justify-center rounded-full bg-primary text-[13px] font-semibold text-white">
                 {(user.name ?? user.email ?? "?").charAt(0).toUpperCase()}

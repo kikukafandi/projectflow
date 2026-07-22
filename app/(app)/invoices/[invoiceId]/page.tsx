@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   Ban,
   Plus,
+  Printer,
   Receipt as ReceiptIcon,
   Trash2,
 } from "lucide-react";
@@ -90,11 +91,18 @@ export default async function InvoiceDetailPage({
         title={inv.number}
         description={client?.name}
         actions={
-          <form action={deleteInvoice.bind(null, invoiceId)}>
-            <Button type="submit" variant="ghost" className="text-danger hover:bg-danger-soft">
-              <Ban /> Hapus / Void
+          <>
+            <Button asChild variant="secondary">
+              <Link href={`/print/invoice/${invoiceId}?back=/invoices/${invoiceId}`}>
+                <Printer /> Cetak
+              </Link>
             </Button>
-          </form>
+            <form action={deleteInvoice.bind(null, invoiceId)}>
+              <Button type="submit" variant="ghost" className="text-danger hover:bg-danger-soft">
+                <Ban /> Hapus / Void
+              </Button>
+            </form>
+          </>
         }
       />
 
@@ -213,6 +221,12 @@ export default async function InvoiceDetailPage({
                             <ReceiptIcon className="size-3.5 text-ink-muted" />
                             <span className="text-ink-secondary">{rc.number}</span>
                             <StatusBadge map={receiptStatus} value={rc.status} />
+                            <Link
+                              href={`/print/receipt/${rc.id}?back=/invoices/${invoiceId}`}
+                              className="text-primary hover:underline"
+                            >
+                              Cetak
+                            </Link>
                           </div>
                         )}
                       </li>

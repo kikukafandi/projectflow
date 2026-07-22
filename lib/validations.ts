@@ -179,6 +179,10 @@ export const businessProfileSchema = z.object({
   npwp: optionalStr,
   slogan: optionalStr,
   primaryColor: optionalStr,
+  // Document identity images (PRD §27.3). URLs — hosting is out of scope for now.
+  logoUrl: optionalStr,
+  signatureUrl: optionalStr,
+  stampUrl: optionalStr,
   defaultNote: optionalStr,
   paymentTerms: optionalStr,
   documentFooter: optionalStr,
