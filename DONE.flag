@@ -1,0 +1,14 @@
+ProjectFlow — Fase 1–7 selesai, `npm run typecheck` + `npm run build` lolos.
+
+Commit terakhir per fase:
+- Fase 6 (Finance)            c91082f
+- Fase 7 (Dokumen/PDF, dll)   2a31c43
+
+Dua item yang SENGAJA dilewati (lihat NEXT_STEPS.md untuk alasannya):
+1. Vercel Blob file upload — butuh `@vercel/blob` + `BLOB_READ_WRITE_TOKEN` yang
+   belum tersedia, jadi tidak bisa diverifikasi. Sementara logo/tanda tangan/
+   stempel diisi via URL di Business Profile.
+2. Spreadsheet export RAB (ExcelJS) — belum dikerjakan.
+
+Tidak ada perubahan schema di sesi ini, jadi tidak ada migration baru.
+Jalankan `npm run db:push` bila database belum sinkron dengan `db/schema/*`.
