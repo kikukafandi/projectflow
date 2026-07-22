@@ -165,6 +165,26 @@ export const rabItemSchema = z.object({
 });
 export type RabItemInput = z.input<typeof rabItemSchema>;
 
+export const quotationMetaSchema = z.object({
+  validUntil: optionalStr,
+  notes: optionalStr,
+  terms: optionalStr,
+});
+export type QuotationMetaInput = z.input<typeof quotationMetaSchema>;
+
+export const paymentTermSchema = z.object({
+  name: z.string().trim().min(1, "Nama termin wajib diisi"),
+  description: optionalStr,
+  type: z
+    .enum(["full", "dp_settlement", "milestone", "percentage", "fixed"])
+    .default("percentage"),
+  percent: optionalMoney,
+  amount: optionalMoney,
+  dueDate: optionalStr,
+  trigger: optionalStr,
+});
+export type PaymentTermInput = z.input<typeof paymentTermSchema>;
+
 export const projectSchema = z.object({
   name: z.string().trim().min(1, "Nama proyek wajib diisi"),
   clientId: z.string().uuid("Klien wajib dipilih"),

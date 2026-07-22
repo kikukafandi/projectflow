@@ -39,8 +39,9 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
 6. ✅ **RAB calc engine** — generate dari scope, section+item, totals dihitung DI SERVER (`lib/money.ts` `computeRabTotals`), editor + ringkasan sticky, diskon/pajak/biaya tambahan.
    - Sisa: spreadsheet export (ExcelJS) & PDF → Fase 7. Revisi/versi RAB opsional.
 
-### Fase 4 — Quotation
-7. Quotation dari RAB, payment terms (validasi total = 100% / grand total), revisi (nomor -R1), approval manual mengunci versi (PRD §37.2).
+### ✅ Fase 4 — Quotation (SELESAI)
+7. ✅ Quotation dari RAB (snapshot section+item), payment terms + peringatan total ≠ grand total, revisi (nomor `-R1`, salin isi, status revised), approval manual mengunci & update `projects.projectValue` (PRD §37.2), approved tidak bisa diedit.
+   - Sisa: PDF export → Fase 7.
 
 ### Fase 5 — Task & Produktivitas
 8. Generate task dari scope, Task Board kanban (§16 DESIGN, kolom Backlog→Done), checklist wajib, dependensi.

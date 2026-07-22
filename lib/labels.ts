@@ -66,6 +66,25 @@ export const rabStatus: Record<string, { label: string; tone: Tone }> = {
   cancelled: { label: "Cancelled", tone: "red" },
 };
 
+export const quotationStatus: Record<string, { label: string; tone: Tone }> = {
+  draft: { label: "Draft", tone: "gray" },
+  sent: { label: "Sent", tone: "blue" },
+  viewed: { label: "Viewed", tone: "purple" },
+  revised: { label: "Revised", tone: "yellow" },
+  approved: { label: "Approved", tone: "green" },
+  rejected: { label: "Rejected", tone: "red" },
+  expired: { label: "Expired", tone: "gray" },
+  cancelled: { label: "Cancelled", tone: "red" },
+};
+
+export const paymentTermTypeLabels: Record<string, string> = {
+  full: "Pembayaran penuh",
+  dp_settlement: "DP & pelunasan",
+  milestone: "Milestone",
+  percentage: "Persentase",
+  fixed: "Nominal tetap",
+};
+
 export const complexityLabels: Record<string, { label: string; tone: Tone }> = {
   very_low: { label: "Very Low", tone: "gray" },
   low: { label: "Low", tone: "green" },
