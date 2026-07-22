@@ -28,5 +28,8 @@ export const config = {
     "/activity/:path*",
     "/search/:path*",
     "/notifications/:path*",
+    "/sales/:path*",
+    "/tasks/:path*",
+    "/documents/:path*",
   ],
 };
