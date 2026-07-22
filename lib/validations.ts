@@ -213,6 +213,47 @@ export const generalSettingsSchema = z.object({
 });
 export type GeneralSettingsInput = z.input<typeof generalSettingsSchema>;
 
+/**
+ * Document number prefixes (PRD §33.4). "/" is the segment separator, so it is
+ * not allowed inside a prefix — that would make numbers ambiguous.
+ */
+const docPrefix = z
+  .string()
+  .trim()
+  .min(1, "Prefix wajib diisi")
+  .max(10, "Prefix maksimal 10 karakter")
+  .regex(/^[A-Za-z0-9-]+$/, "Prefix hanya boleh huruf, angka, dan tanda hubung");
+
+export const numberingSchema = z.object({
+  project: docPrefix,
+  rab: docPrefix,
+  quotation: docPrefix,
+  invoice: docPrefix,
+  receipt: docPrefix,
+});
+export type NumberingInput = z.input<typeof numberingSchema>;
+
+export const accountProfileSchema = z.object({
+  name: z.string().trim().min(1, "Nama wajib diisi").max(100, "Nama terlalu panjang"),
+});
+export type AccountProfileInput = z.input<typeof accountProfileSchema>;
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Password saat ini wajib diisi"),
+    newPassword: z.string().min(8, "Password baru minimal 8 karakter"),
+    confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi"),
+  })
+  .refine((v) => v.newPassword === v.confirmPassword, {
+    message: "Konfirmasi password tidak sama",
+    path: ["confirmPassword"],
+  })
+  .refine((v) => v.newPassword !== v.currentPassword, {
+    message: "Password baru harus berbeda dari password saat ini",
+    path: ["newPassword"],
+  });
+export type ChangePasswordInput = z.input<typeof changePasswordSchema>;
+
 export const scopeFeatureSchema = z.object({
   name: z.string().trim().min(1, "Nama fitur wajib diisi"),
   description: optionalStr,

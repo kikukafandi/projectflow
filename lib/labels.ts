@@ -164,6 +164,7 @@ const activityLabels: Record<string, string> = {
   "client.created": "Klien dibuat",
   "client.updated": "Klien diperbarui",
   "invoice.created": "Invoice dibuat",
+  "numbering.saved": "Format nomor dokumen diubah",
   "payment.cancelled": "Pembayaran dibatalkan",
   "payment.recorded": "Pembayaran dicatat",
   "project.archived": "Proyek diarsipkan",

@@ -1,8 +1,20 @@
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
 import { documentSequences } from "@/db/schema";
+import { getSettings } from "@/lib/settings";
 
-const formats: Record<string, string> = {
+export const DOC_NUMBER_TYPES = [
+  "project",
+  "rab",
+  "quotation",
+  "invoice",
+  "receipt",
+] as const;
+
+export type DocNumberType = (typeof DOC_NUMBER_TYPES)[number];
+
+/** Defaults per PRD §33.4. Overridable in Settings > Numbering. */
+export const defaultPrefixes: Record<DocNumberType, string> = {
   project: "PRJ",
   rab: "RAB",
   quotation: "QT",
@@ -10,12 +22,45 @@ const formats: Record<string, string> = {
   receipt: "RCP",
 };
 
+export const docNumberLabels: Record<DocNumberType, string> = {
+  project: "Proyek",
+  rab: "RAB",
+  quotation: "Quotation",
+  invoice: "Invoice",
+  receipt: "Kuitansi",
+};
+
+/** Settings key holding the prefix for a document type. */
+export function prefixKey(docType: DocNumberType): string {
+  return `numbering.${docType}`;
+}
+
+/** Configured prefixes, falling back to the PRD defaults. */
+export async function getPrefixes(): Promise<Record<DocNumberType, string>> {
+  const stored = await getSettings(DOC_NUMBER_TYPES.map(prefixKey));
+  const out = { ...defaultPrefixes };
+  for (const t of DOC_NUMBER_TYPES) {
+    const v = stored[prefixKey(t)]?.trim();
+    if (v) out[t] = v;
+  }
+  return out;
+}
+
+export function formatDocumentNumber(
+  prefix: string,
+  year: number,
+  sequence: number,
+): string {
+  return `${prefix}/${year}/${String(sequence).padStart(3, "0")}`;
+}
+
 /**
  * Atomically reserve the next document number, e.g. "PRJ/2026/001".
- * Increment happens in a single upsert statement (safe on Neon HTTP driver).
+ * Increment happens in a single upsert statement (safe on Neon HTTP driver),
+ * so a number is never handed out twice (PRD §33.5).
  */
 export async function nextDocumentNumber(
-  docType: keyof typeof formats,
+  docType: DocNumberType,
 ): Promise<string> {
   const year = new Date().getFullYear();
   const [row] = await db
@@ -27,6 +72,6 @@ export async function nextDocumentNumber(
     })
     .returning({ seq: documentSequences.lastSequence });
 
-  const prefix = formats[docType] ?? docType.toUpperCase();
-  return `${prefix}/${year}/${String(row.seq).padStart(3, "0")}`;
+  const prefixes = await getPrefixes();
+  return formatDocumentNumber(prefixes[docType] ?? docType.toUpperCase(), year, row.seq);
 }
