@@ -80,6 +80,43 @@ export const featureItemSchema = z.object({
 });
 export type FeatureItemInput = z.input<typeof featureItemSchema>;
 
+export const taskStatusValues = [
+  "backlog",
+  "ready",
+  "in_progress",
+  "blocked",
+  "review",
+  "testing",
+  "client_review",
+  "done",
+  "cancelled",
+] as const;
+
+export const taskSchema = z.object({
+  title: z.string().trim().min(1, "Judul task wajib diisi"),
+  description: optionalStr,
+  status: z.enum(taskStatusValues).default("backlog"),
+  priority: priorityEnum.default("medium"),
+  estimateHours: optionalMoney,
+  deadline: optionalStr,
+  definitionOfDone: optionalStr,
+  notes: optionalStr,
+});
+export type TaskInput = z.input<typeof taskSchema>;
+
+const factor = z.coerce.number().int().min(1).max(5).default(3);
+export const priorityFactorsSchema = z.object({
+  businessValue: factor,
+  urgency: factor,
+  dependencyImportance: factor,
+  clientImpact: factor,
+  revenueImpact: factor,
+  complexity: factor,
+  effort: factor,
+  risk: factor,
+});
+export type PriorityFactorsInput = z.input<typeof priorityFactorsSchema>;
+
 export const businessProfileSchema = z.object({
   businessName: z.string().trim().min(1, "Nama bisnis wajib diisi"),
   ownerName: optionalStr,

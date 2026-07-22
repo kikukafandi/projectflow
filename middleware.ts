@@ -19,6 +19,8 @@ export const config = {
     "/dashboard/:path*",
     "/clients/:path*",
     "/projects/:path*",
+    "/library/:path*",
+    "/focus/:path*",
     "/settings/:path*",
   ],
 };

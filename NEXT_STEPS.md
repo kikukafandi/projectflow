@@ -43,9 +43,10 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
 7. ✅ Quotation dari RAB (snapshot section+item), payment terms + peringatan total ≠ grand total, revisi (nomor `-R1`, salin isi, status revised), approval manual mengunci & update `projects.projectValue` (PRD §37.2), approved tidak bisa diedit.
    - Sisa: PDF export → Fase 7.
 
-### Fase 5 — Task & Produktivitas
-8. Generate task dari scope, Task Board kanban (§16 DESIGN, kolom Backlog→Done), checklist wajib, dependensi.
-9. Priority Score (PRD §21.3), WIP Limit (§22, default proyek 2 / task 2 / focus 3, override + alasan → activity log), Daily Focus (§23, max 3).
+### ✅ Fase 5 — Task & Produktivitas (SELESAI)
+8. ✅ Generate task dari scope, Task Board kanban (§16, move via dropdown), checklist wajib + guard Done (§37.6), progress proyek auto.
+9. ✅ Priority Score (`lib/priority.ts`, §21.3 + level), WIP Limit (§22, default 2, override + alasan → activity log), Daily Focus global (§23, max 3, rekomendasi by skor).
+   - Sisa: task dependencies UI (tabel sudah ada), global task board lintas proyek — opsional.
 
 ### Fase 6 — Finance
 10. Invoice dari quotation/termin, partial invoice, status otomatis dari pembayaran.

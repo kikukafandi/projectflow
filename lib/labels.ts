@@ -50,6 +50,29 @@ export const projectStatus: Record<string, { label: string; tone: Tone }> = {
   archived: { label: "Archived", tone: "gray" },
 };
 
+export const taskStatus: Record<string, { label: string; tone: Tone }> = {
+  backlog: { label: "Backlog", tone: "gray" },
+  ready: { label: "Ready", tone: "blue" },
+  in_progress: { label: "In Progress", tone: "blue" },
+  blocked: { label: "Blocked", tone: "red" },
+  review: { label: "Review", tone: "purple" },
+  testing: { label: "Testing", tone: "cyan" },
+  client_review: { label: "Client Review", tone: "purple" },
+  done: { label: "Done", tone: "green" },
+  cancelled: { label: "Cancelled", tone: "red" },
+};
+
+/** Kanban column order for the board (DESIGN.MD §16). */
+export const taskBoardColumns = [
+  "backlog",
+  "ready",
+  "in_progress",
+  "blocked",
+  "review",
+  "testing",
+  "done",
+] as const;
+
 export const scopeStatus: Record<string, { label: string; tone: Tone }> = {
   draft: { label: "Draft", tone: "gray" },
   included: { label: "Included", tone: "green" },

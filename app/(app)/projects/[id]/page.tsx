@@ -23,7 +23,7 @@ const TABS: { label: string; href?: string }[] = [
   { label: "Scope", href: "scope" },
   { label: "RAB", href: "rab" },
   { label: "Quotations", href: "quotations" },
-  { label: "Tasks" },
+  { label: "Tasks", href: "tasks" },
   { label: "Invoices" },
   { label: "Files" },
   { label: "Activity" },
