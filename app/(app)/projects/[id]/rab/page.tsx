@@ -78,7 +78,9 @@ export default async function RabListPage({
                 <CardContent className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-ink">{r.number}</span>
+                      <span className="font-medium text-ink">
+                        {r.number ?? "Draft RAB"}
+                      </span>
                       <StatusBadge map={rabStatus} value={r.status} />
                     </div>
                     <div className="text-[13px] text-ink-muted">

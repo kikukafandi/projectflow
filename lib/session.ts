@@ -13,3 +13,16 @@ export async function requireUser() {
   if (!session) redirect("/login");
   return session.user;
 }
+
+/**
+ * Apakah user termasuk "super admin" — dari allowlist email di env ADMIN_EMAILS
+ * (dipisah koma). Fail-closed: env kosong berarti tidak ada yang admin, jadi aksi
+ * berbahaya seperti hapus paksa tetap tertutup sampai email sengaja didaftarkan.
+ */
+export function isAdmin(user: { email?: string | null }): boolean {
+  const allow = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return !!user.email && allow.includes(user.email.toLowerCase());
+}

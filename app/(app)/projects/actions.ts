@@ -1,13 +1,13 @@
 "use server";
 
-import { count, eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { invoices, projects } from "@/db/schema";
 import { logActivity } from "@/lib/activity";
 import { nextDocumentNumber } from "@/lib/numbering";
-import { requireUser } from "@/lib/session";
+import { isAdmin, requireUser } from "@/lib/session";
 import { projectSchema, type ProjectInput } from "@/lib/validations";
 
 type Result = { error: string } | void;
@@ -138,6 +138,37 @@ export async function deleteProject(id: string): Promise<void> {
   await logActivity({
     userId: user.id,
     action: "project.deleted",
+    entityType: "project",
+    entityId: id,
+  });
+  revalidatePath("/projects");
+  redirect("/projects");
+}
+
+/**
+ * Hapus paksa: buang proyek beserta invoice-nya (menembus guard arsip). Hanya
+ * untuk admin (ADMIN_EMAILS). Bottom-up menembus FK RESTRICT receipt→payment→
+ * invoice; hapus proyek meng-cascade RAB/scope/quotation/task.
+ * ponytail: hapus berurutan (neon-http). Bungkus db.transaction bila butuh atomik.
+ */
+export async function forceDeleteProject(id: string): Promise<void> {
+  const user = await requireUser();
+  if (!isAdmin(user)) redirect(`/projects/${id}`);
+
+  await db.execute(
+    sql`DELETE FROM receipts r USING payments p, invoices i WHERE r.payment_id = p.id AND p.invoice_id = i.id AND i.project_id = ${id}::uuid`,
+  );
+  await db.execute(
+    sql`DELETE FROM payments p USING invoices i WHERE p.invoice_id = i.id AND i.project_id = ${id}::uuid`,
+  );
+  await db.execute(
+    sql`DELETE FROM invoice_items ii USING invoices i WHERE ii.invoice_id = i.id AND i.project_id = ${id}::uuid`,
+  );
+  await db.delete(invoices).where(eq(invoices.projectId, id));
+  await db.delete(projects).where(eq(projects.id, id));
+  await logActivity({
+    userId: user.id,
+    action: "project.force_deleted",
     entityType: "project",
     entityId: id,
   });

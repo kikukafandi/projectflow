@@ -66,7 +66,7 @@ export function InvoiceMetaForm({
         <Textarea id="notes" {...register("notes")} />
       </Field>
       <div className="flex items-center gap-2">
-        <Button type="submit" size="sm" disabled={isSubmitting}>
+        <Button type="submit" size="sm" loading={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : "Simpan & Hitung Ulang"}
         </Button>
         {saved && <span className="text-[13px] text-success">Tersimpan.</span>}

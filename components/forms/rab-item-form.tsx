@@ -54,9 +54,8 @@ export function RabItemForm({
           <Field label="Harga Satuan (IDR)" htmlFor="unitPrice">
             <Input id="unitPrice" inputMode="numeric" className="tabular" {...register("unitPrice")} />
           </Field>
-          <Field label="Bobot (%)" htmlFor="weight">
-            <Input id="weight" inputMode="numeric" className="tabular" {...register("weight")} />
-          </Field>
+          {/* Bobot dihitung otomatis dari porsi subtotal item terhadap total —
+              lihat kolom "Bobot" di tabel RAB. Tidak diisi manual. */}
           <Field label="Estimasi (jam)" htmlFor="estimateHours">
             <Input id="estimateHours" inputMode="numeric" className="tabular" {...register("estimateHours")} />
           </Field>
@@ -75,7 +74,7 @@ export function RabItemForm({
       )}
 
       <div className="flex items-center gap-2">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" loading={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : submitLabel}
         </Button>
         <Button type="button" variant="secondary" onClick={() => router.back()}>

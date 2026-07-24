@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +23,8 @@ export function CategoryForm({
 }) {
   const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const confirmRef = useRef<HTMLDialogElement>(null);
   const {
     register,
     handleSubmit,
@@ -59,26 +61,58 @@ export function CategoryForm({
       )}
 
       <div className="flex items-center gap-2">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" loading={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : submitLabel}
         </Button>
         <Button type="button" variant="secondary" onClick={() => router.back()}>
           Batal
         </Button>
         {onDelete && (
-          <Button
-            type="button"
-            variant="ghost"
-            className="ml-auto text-danger hover:bg-danger-soft"
-            onClick={async () => {
-              if (confirm("Hapus kategori ini?")) {
-                await onDelete();
-                router.push("/library");
-              }
-            }}
-          >
-            Hapus
-          </Button>
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              className="ml-auto text-danger hover:bg-danger-soft"
+              onClick={() => confirmRef.current?.showModal()}
+            >
+              Hapus
+            </Button>
+            <dialog
+              ref={confirmRef}
+              className="m-auto w-[min(26rem,calc(100vw-2rem))] rounded-[16px] bg-surface p-5 text-ink shadow-lg backdrop:bg-black/40"
+            >
+              <h2 className="text-[15px] font-semibold text-ink">
+                Hapus kategori ini?
+              </h2>
+              <p className="mt-2 text-[13px] leading-relaxed text-ink-secondary">
+                Kategori dihapus permanen dan tidak bisa dikembalikan.
+              </p>
+              <div className="mt-5 flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => confirmRef.current?.close()}
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="button"
+                  variant="danger"
+                  size="sm"
+                  loading={deleting}
+                  onClick={async () => {
+                    setDeleting(true);
+                    confirmRef.current?.close();
+                    await onDelete();
+                    router.push("/library");
+                  }}
+                >
+                  Hapus
+                </Button>
+              </div>
+            </dialog>
+          </>
         )}
       </div>
     </form>

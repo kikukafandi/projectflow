@@ -137,12 +137,13 @@ export async function loadDocument(
       discount: rab.discount,
       taxPercent: rab.taxPercent,
       additionalCost: rab.additionalCost,
+      profitPercent: rab.profitPercent,
     });
     return {
       profile,
       doc: {
         docLabel: "Rencana Anggaran Biaya",
-        number: rab.number,
+        number: rab.number ?? "DRAFT",
         meta: [
           { label: "Tanggal", value: formatDate(rab.createdAt) },
           { label: "Proyek", value: project?.name ?? "—" },
@@ -150,7 +151,13 @@ export async function loadDocument(
         ],
         recipient: clientBlock(client),
         sections: docSections,
-        totals: totalsRows(t, rab.discount, rab.taxPercent, rab.additionalCost),
+        totals: totalsRows(
+          t,
+          rab.discount,
+          rab.taxPercent,
+          rab.additionalCost,
+          rab.profitPercent,
+        ),
         notes: rab.notes,
         bank: null,
         signedLabel: "Disusun oleh",
@@ -323,14 +330,22 @@ function totalsRows(
   discount: string | null,
   taxPercent: string | null,
   additionalCost: string | null,
+  profitPercent: string | null,
 ): DocTotal[] {
-  const rows: DocTotal[] = [{ label: "Subtotal", value: formatIDR(t.subtotal) }];
+  const rows: DocTotal[] = [
+    { label: "Biaya Operasional", value: formatIDR(t.subtotal) },
+  ];
   if (toNum(discount) > 0)
     rows.push({ label: "Diskon", value: `−${formatIDR(discount)}` });
+  if (toNum(profitPercent) > 0)
+    rows.push({
+      label: `Keuntungan (${Number(profitPercent)}%)`,
+      value: `+${formatIDR(t.profit)}`,
+    });
   if (toNum(taxPercent) > 0)
     rows.push({ label: `Pajak (${Number(taxPercent)}%)`, value: formatIDR(t.tax) });
   if (toNum(additionalCost) > 0)
     rows.push({ label: "Biaya tambahan", value: formatIDR(additionalCost) });
-  rows.push({ label: "Grand Total", value: formatIDR(t.grandTotal), strong: true });
+  rows.push({ label: "Harga Jual", value: formatIDR(t.grandTotal), strong: true });
   return rows;
 }

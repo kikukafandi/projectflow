@@ -14,20 +14,24 @@ export type RabTotalsInput = {
   discount?: string | number | null;
   taxPercent?: string | number | null;
   additionalCost?: string | number | null;
+  profitPercent?: string | number | null;
 };
 
 export type RabTotals = {
   subtotal: number;
   afterDiscount: number;
+  profit: number;
   tax: number;
   grandTotal: number;
 };
 
 /**
- * subtotal = Σ(qty × unitPrice)
- * afterDiscount = subtotal − discount
- * tax = afterDiscount × taxPercent%
- * grandTotal = afterDiscount + tax + additionalCost
+ * subtotal (biaya)  = Σ(qty × unitPrice)
+ * afterDiscount     = subtotal − discount
+ * profit            = afterDiscount × profitPercent%   (keuntungan, internal)
+ * beforeTax         = afterDiscount + profit
+ * tax               = beforeTax × taxPercent%
+ * grandTotal (jual) = beforeTax + tax + additionalCost
  */
 export function computeRabTotals(input: RabTotalsInput): RabTotals {
   const subtotal = input.items.reduce(
@@ -36,11 +40,14 @@ export function computeRabTotals(input: RabTotalsInput): RabTotals {
   );
   const discount = toNum(input.discount);
   const afterDiscount = Math.max(0, subtotal - discount);
-  const tax = afterDiscount * (toNum(input.taxPercent) / 100);
-  const grandTotal = afterDiscount + tax + toNum(input.additionalCost);
+  const profit = afterDiscount * (toNum(input.profitPercent) / 100);
+  const beforeTax = afterDiscount + profit;
+  const tax = beforeTax * (toNum(input.taxPercent) / 100);
+  const grandTotal = beforeTax + tax + toNum(input.additionalCost);
   return {
     subtotal: Math.round(subtotal),
     afterDiscount: Math.round(afterDiscount),
+    profit: Math.round(profit),
     tax: Math.round(tax),
     grandTotal: Math.round(grandTotal),
   };

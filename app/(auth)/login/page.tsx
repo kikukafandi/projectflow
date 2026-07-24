@@ -103,7 +103,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" loading={loading}>
               {loading
                 ? "Memproses…"
                 : mode === "signin"

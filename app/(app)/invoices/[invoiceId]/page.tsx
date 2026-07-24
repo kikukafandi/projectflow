@@ -21,6 +21,7 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Select } from "@/components/ui/input";
 import { InvoiceMetaForm } from "@/components/forms/invoice-meta-form";
@@ -98,9 +99,15 @@ export default async function InvoiceDetailPage({
               </Link>
             </Button>
             <form action={deleteInvoice.bind(null, invoiceId)}>
-              <Button type="submit" variant="ghost" className="text-danger hover:bg-danger-soft">
+              <ConfirmSubmit
+                variant="ghost"
+                className="text-danger hover:bg-danger-soft"
+                title={`Hapus invoice ${inv.number}?`}
+                confirmLabel="Hapus / Void"
+                message="Invoice draft dihapus permanen. Invoice yang sudah terkirim atau sudah ada pembayarannya akan di-void, bukan dihapus."
+              >
                 <Ban /> Hapus / Void
-              </Button>
+              </ConfirmSubmit>
             </form>
           </>
         }

@@ -22,6 +22,7 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select } from "@/components/ui/input";
 import { QuotationMetaForm } from "@/components/forms/quotation-meta-form";
@@ -132,9 +133,14 @@ export default async function QuotationEditorPage({
               </Button>
             </form>
             <form action={deleteQuotation.bind(null, id, qid)}>
-              <Button type="submit" variant="ghost" className="text-danger hover:bg-danger-soft">
+              <ConfirmSubmit
+                variant="ghost"
+                className="text-danger hover:bg-danger-soft"
+                title="Hapus quotation ini?"
+                message="Termin pembayaran di dalamnya ikut terhapus permanen."
+              >
                 <Trash2 /> Hapus
-              </Button>
+              </ConfirmSubmit>
             </form>
           </>
         }

@@ -7,6 +7,7 @@ import { clients, projects } from "@/db/schema";
 import { PageHeader } from "@/components/page-header";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import {
   clientStatus,
@@ -14,7 +15,13 @@ import {
   projectStatus,
 } from "@/lib/labels";
 import { formatIDR } from "@/lib/utils";
-import { archiveClient, deleteClient, unarchiveClient } from "../actions";
+import { isAdmin, requireUser } from "@/lib/session";
+import {
+  archiveClient,
+  deleteClient,
+  forceDeleteClient,
+  unarchiveClient,
+} from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +43,7 @@ export default async function ClientDetailPage({
 }) {
   const { id } = await params;
   const { archived } = await searchParams;
+  const admin = isAdmin(await requireUser());
   const [client] = await db.select().from(clients).where(eq(clients.id, id));
   if (!client) notFound();
 
@@ -74,14 +82,27 @@ export default async function ClientDetailPage({
               </form>
             )}
             <form action={deleteClient.bind(null, id)}>
-              <Button
-                type="submit"
+              <ConfirmSubmit
                 variant="ghost"
                 className="text-danger hover:bg-danger-soft"
+                title={`Hapus klien ${client.name}?`}
+                message="Data klien dihapus permanen dan tidak bisa dikembalikan. Kalau klien ini masih punya proyek atau invoice, sistem akan mengarsipkannya saja."
               >
                 <Trash2 /> Hapus
-              </Button>
+              </ConfirmSubmit>
             </form>
+            {admin && (
+              <form action={forceDeleteClient.bind(null, id)}>
+                <ConfirmSubmit
+                  variant="danger"
+                  confirmLabel="Ya, hapus paksa"
+                  title={`Hapus PAKSA klien ${client.name}?`}
+                  message="SEMUA proyek, RAB, quotation, invoice, pembayaran, dan kwitansi milik klien ini ikut terhapus PERMANEN. Tidak bisa dikembalikan. Hanya untuk admin."
+                >
+                  <Trash2 /> Hapus paksa
+                </ConfirmSubmit>
+              </form>
+            )}
           </>
         }
       />

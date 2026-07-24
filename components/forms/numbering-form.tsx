@@ -98,7 +98,7 @@ export function NumberingForm({
         </div>
       )}
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" loading={isSubmitting}>
         {isSubmitting ? "Menyimpan…" : "Simpan Format"}
       </Button>
     </form>

@@ -39,6 +39,7 @@ async function recomputeRab(rabId: string) {
     discount: rab.discount,
     taxPercent: rab.taxPercent,
     additionalCost: rab.additionalCost,
+    profitPercent: rab.profitPercent,
   });
   await db
     .update(rabs)
@@ -52,10 +53,10 @@ async function recomputeRab(rabId: string) {
 
 export async function generateRabFromScope(projectId: string): Promise<void> {
   const user = await requireUser();
-  const number = await nextDocumentNumber("rab");
+  // Draft internal: belum bernomor. Nomor diambil saat finalizeRab.
   const [rab] = await db
     .insert(rabs)
-    .values({ projectId, number, title: "RAB dari scope", status: "draft" })
+    .values({ projectId, title: "RAB dari scope", status: "draft" })
     .returning({ id: rabs.id });
 
   const mods = await db
@@ -100,7 +101,7 @@ export async function generateRabFromScope(projectId: string): Promise<void> {
     action: "rab.generated",
     entityType: "rab",
     entityId: rab.id,
-    note: number,
+    note: "draft",
   });
   revalidatePath(`/projects/${projectId}/rab`);
   redirect(`/projects/${projectId}/rab/${rab.id}`);
@@ -121,12 +122,42 @@ export async function updateRabMeta(
       discount: parsed.data.discount ?? "0",
       taxPercent: parsed.data.taxPercent ?? "0",
       additionalCost: parsed.data.additionalCost ?? "0",
+      profitPercent: parsed.data.profitPercent ?? "0",
       notes: parsed.data.notes,
       updatedAt: new Date(),
     })
     .where(eq(rabs.id, rabId));
   await recomputeRab(rabId);
   revalidatePath(`/projects/${projectId}/rab/${rabId}`);
+}
+
+/**
+ * Finalkan RAB: draft → final, dan baru di sini nomor RAB/2026/00x diambil
+ * (kalau belum punya). Setelah final, RAB bernomor dan boleh dicetak / dijadikan
+ * quotation. Idempoten: RAB yang sudah bernomor hanya diset status final.
+ */
+export async function finalizeRab(
+  projectId: string,
+  rabId: string,
+): Promise<void> {
+  const user = await requireUser();
+  const [rab] = await db.select().from(rabs).where(eq(rabs.id, rabId));
+  if (!rab) redirect(`/projects/${projectId}/rab`);
+
+  const number = rab.number ?? (await nextDocumentNumber("rab"));
+  await db
+    .update(rabs)
+    .set({ number, status: "final", updatedAt: new Date() })
+    .where(eq(rabs.id, rabId));
+  await logActivity({
+    userId: user.id,
+    action: "rab.finalized",
+    entityType: "rab",
+    entityId: rabId,
+    note: number,
+  });
+  revalidatePath(`/projects/${projectId}/rab/${rabId}`);
+  revalidatePath(`/projects/${projectId}/rab`);
 }
 
 export async function addRabSection(

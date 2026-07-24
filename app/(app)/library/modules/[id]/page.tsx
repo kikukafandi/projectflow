@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, CardContent } from "@/components/ui/card";
 import { complexityLabels, pricingMethodLabels } from "@/lib/labels";
 import { formatIDR } from "@/lib/utils";
@@ -59,9 +60,14 @@ export default async function ModuleDetailPage({
               </Link>
             </Button>
             <form action={deleteModule.bind(null, id)}>
-              <Button type="submit" variant="ghost" className="text-danger hover:bg-danger-soft">
+              <ConfirmSubmit
+                variant="ghost"
+                className="text-danger hover:bg-danger-soft"
+                title="Hapus modul ini?"
+                message="Semua fitur di dalam modul ini ikut terhapus dari Feature Library."
+              >
                 <Trash2 /> Hapus
-              </Button>
+              </ConfirmSubmit>
             </form>
           </>
         }

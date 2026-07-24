@@ -274,6 +274,7 @@ export const rabMetaSchema = z.object({
   discount: optionalMoney,
   taxPercent: optionalMoney,
   additionalCost: optionalMoney,
+  profitPercent: optionalMoney,
   notes: optionalStr,
 });
 export type RabMetaInput = z.input<typeof rabMetaSchema>;
@@ -284,7 +285,7 @@ export const rabItemSchema = z.object({
   quantity: optionalMoney,
   unit: optionalStr,
   unitPrice: optionalMoney,
-  weight: optionalMoney,
+  // weight (bobot) dihitung otomatis di tampilan RAB, bukan diinput.
   estimateHours: optionalMoney,
   notes: optionalStr,
 });

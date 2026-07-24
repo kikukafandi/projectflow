@@ -24,7 +24,6 @@ export default async function EditRabItemPage({
     quantity: it.quantity ?? "1",
     unit: it.unit ?? undefined,
     unitPrice: it.unitPrice ?? "0",
-    weight: it.weight ?? undefined,
     estimateHours: it.estimateHours ?? undefined,
     notes: it.notes ?? undefined,
   };

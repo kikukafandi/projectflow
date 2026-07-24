@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { ArrowLeft, FileText } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -32,9 +32,10 @@ export default async function QuotationListPage({
       .where(eq(quotations.projectId, id))
       .orderBy(desc(quotations.createdAt)),
     db
+      // Hanya RAB final (bernomor) yang bisa dijadikan quotation; draft internal disaring.
       .select({ id: rabs.id, number: rabs.number })
       .from(rabs)
-      .where(eq(rabs.projectId, id))
+      .where(and(eq(rabs.projectId, id), isNotNull(rabs.number)))
       .orderBy(desc(rabs.createdAt)),
   ]);
 

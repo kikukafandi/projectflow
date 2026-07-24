@@ -9,7 +9,7 @@ import { navItems } from "./nav";
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
-    <nav className="flex flex-1 flex-col gap-1 px-3">
+    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
       {navItems.map((item) => {
         const active =
           pathname === item.href || pathname.startsWith(item.href + "/");
@@ -69,8 +69,8 @@ function Brand() {
 /** Desktop dark rounded sidebar (DESIGN.MD §10). */
 export function DesktopSidebar() {
   return (
-    <aside className="hidden lg:flex lg:w-[248px] lg:shrink-0 lg:p-3">
-      <div className="flex w-full flex-col rounded-[24px] bg-sidebar-bg pb-4">
+    <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[248px] lg:shrink-0 lg:p-3">
+      <div className="flex min-h-0 w-full flex-col rounded-[24px] bg-sidebar-bg pb-4">
         <Brand />
         <NavLinks />
       </div>

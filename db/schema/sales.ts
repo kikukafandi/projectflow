@@ -20,12 +20,16 @@ export const rabs = pgTable("rabs", {
   projectId: uuid("project_id")
     .notNull()
     .references(() => projects.id, { onDelete: "cascade" }),
-  number: text("number").notNull().unique(),
+  // Nullable: draft internal belum bernomor. Nomor RAB/2026/00x baru diambil saat
+  // di-"finalkan". Postgres mengizinkan banyak NULL pada kolom unique.
+  number: text("number").unique(),
   title: text("title"),
   status: rabStatusEnum("status").default("draft").notNull(),
   currentVersion: integer("current_version").default(1).notNull(),
   discount: numeric("discount", { precision: 14, scale: 2 }).default("0"),
   taxPercent: numeric("tax_percent", { precision: 5, scale: 2 }).default("0"),
+  // Margin keuntungan (%) di atas biaya operasional — internal, untuk hitung harga jual.
+  profitPercent: numeric("profit_percent", { precision: 5, scale: 2 }).default("0"),
   additionalCost: numeric("additional_cost", {
     precision: 14,
     scale: 2,

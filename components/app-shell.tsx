@@ -7,6 +7,7 @@ import { useState } from "react";
 import { signOut } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { DesktopSidebar, MobileDrawer } from "./app-sidebar";
+import { NavProgress } from "./nav-progress";
 import { bottomNavHrefs, navItems } from "./nav";
 
 export function AppShell({
@@ -34,6 +35,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen">
+      <NavProgress />
       <DesktopSidebar />
       <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 

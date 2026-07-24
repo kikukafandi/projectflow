@@ -148,7 +148,7 @@ export function BusinessProfileForm({
         </div>
       )}
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" loading={isSubmitting}>
         {isSubmitting ? "Menyimpan…" : "Simpan Profil"}
       </Button>
     </form>

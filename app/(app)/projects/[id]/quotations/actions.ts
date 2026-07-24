@@ -36,6 +36,8 @@ export async function generateQuotationFromRab(
   if (!rabId) return;
   const [rab] = await db.select().from(rabs).where(eq(rabs.id, rabId));
   if (!rab) return;
+  // RAB draft (belum bernomor) masih hitungan internal — finalkan dulu.
+  if (!rab.number) redirect(`/projects/${projectId}/rab/${rabId}`);
 
   const number = await nextDocumentNumber("quotation");
   const [q] = await db

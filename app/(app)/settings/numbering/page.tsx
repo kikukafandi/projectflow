@@ -1,10 +1,11 @@
 import { eq } from "drizzle-orm";
-import { ArrowLeft, Info } from "lucide-react";
+import { ArrowLeft, Info, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/db";
 import { documentSequences } from "@/db/schema";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Table, TD, TH, THead, TR } from "@/components/ui/table";
 import { NumberingForm } from "@/components/forms/numbering-form";
 import {
@@ -13,13 +14,15 @@ import {
   formatDocumentNumber,
   getPrefixes,
 } from "@/lib/numbering";
+import { isAdmin, requireUser } from "@/lib/session";
 import type { NumberingInput } from "@/lib/validations";
-import { saveNumbering } from "./actions";
+import { resetSequence, saveNumbering } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function NumberingSettingsPage() {
   const year = new Date().getFullYear();
+  const admin = isAdmin(await requireUser());
   const [prefixes, sequences] = await Promise.all([
     getPrefixes(),
     db
@@ -76,6 +79,7 @@ export default async function NumberingSettingsPage() {
                   <TH className="text-right">Sudah dipakai</TH>
                   <TH>Nomor terakhir</TH>
                   <TH>Nomor berikutnya</TH>
+                  {admin && <TH className="text-right">Aksi</TH>}
                 </tr>
               </THead>
               <tbody>
@@ -93,6 +97,26 @@ export default async function NumberingSettingsPage() {
                       <TD className="tabular text-ink-secondary">
                         {formatDocumentNumber(prefixes[t], year, used + 1)}
                       </TD>
+                      {admin && (
+                        <TD className="text-right">
+                          {used > 0 ? (
+                            <form action={resetSequence.bind(null, t)}>
+                              <ConfirmSubmit
+                                variant="ghost"
+                                size="sm"
+                                className="text-danger hover:bg-danger-soft"
+                                confirmLabel="Ya, reset ke 001"
+                                title={`Reset nomor ${docNumberLabels[t]}?`}
+                                message={`Counter ${docNumberLabels[t]} tahun ${year} dikembalikan ke 0, sehingga dokumen berikutnya mulai dari /001 lagi. Lakukan hanya jika dokumen lama dengan nomor itu sudah dihapus, agar tidak ada nomor kembar.`}
+                              >
+                                <RotateCcw /> Reset
+                              </ConfirmSubmit>
+                            </form>
+                          ) : (
+                            <span className="text-[13px] text-ink-muted">—</span>
+                          )}
+                        </TD>
+                      )}
                     </TR>
                   );
                 })}

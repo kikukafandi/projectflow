@@ -97,15 +97,18 @@ export default async function DocumentsPage() {
   ]);
 
   const rows: Row[] = [
-    ...rabRows.map((r) => ({
-      id: r.id,
-      docType: "rab" as const,
-      number: r.number,
-      date: r.createdAt,
-      context: r.projectName ?? "—",
-      amount: r.grandTotal,
-      editHref: `/projects/${r.projectId}/rab/${r.id}`,
-    })),
+    // Draft RAB (belum bernomor) tidak masuk daftar dokumen — masih hitungan internal.
+    ...rabRows
+      .filter((r) => r.number !== null)
+      .map((r) => ({
+        id: r.id,
+        docType: "rab" as const,
+        number: r.number as string,
+        date: r.createdAt,
+        context: r.projectName ?? "—",
+        amount: r.grandTotal,
+        editHref: `/projects/${r.projectId}/rab/${r.id}`,
+      })),
     ...quotationRows.map((q) => ({
       id: q.id,
       docType: "quotation" as const,

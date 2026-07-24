@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, CardContent } from "@/components/ui/card";
 import { deleteBankAccount, setPrimaryBankAccount } from "./actions";
 
@@ -80,15 +81,16 @@ export default async function BankAccountsPage() {
                     </Link>
                   </Button>
                   <form action={deleteBankAccount.bind(null, b.id)}>
-                    <Button
-                      type="submit"
+                    <ConfirmSubmit
                       variant="ghost"
                       size="icon"
                       aria-label="Hapus"
                       className="text-danger hover:bg-danger-soft"
+                      title={`Hapus rekening ${b.bankName}?`}
+                      message="Rekening ini tidak akan muncul lagi sebagai tujuan pembayaran."
                     >
                       <Trash2 className="size-4" />
-                    </Button>
+                    </ConfirmSubmit>
                   </form>
                 </div>
               </CardContent>

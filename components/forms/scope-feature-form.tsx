@@ -97,7 +97,7 @@ export function ScopeFeatureForm({
       )}
 
       <div className="flex items-center gap-2">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" loading={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : submitLabel}
         </Button>
         <Button type="button" variant="secondary" onClick={() => router.back()}>

@@ -60,7 +60,7 @@ export function QuotationMetaForm({
       )}
       {msg?.ok && <span className="text-[13px] text-success">Tersimpan.</span>}
       {!disabled && (
-        <Button type="submit" size="sm" disabled={isSubmitting}>
+        <Button type="submit" size="sm" loading={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : "Simpan"}
         </Button>
       )}

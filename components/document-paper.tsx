@@ -190,25 +190,39 @@ export function DocumentPaper({
       <section className="mt-8 flex justify-end">
         <div className="w-56 text-center text-[11.5px]">
           <div className="text-ink-secondary">{doc.signedLabel},</div>
-          <div className="relative h-20">
+          {/* Stempel ~30mm (h-28 ≈ 112px @96dpi) mendekati ukuran cap asli.
+              Ubah h-/w- bila stempelmu lebih besar/kecil. */}
+          <div className="relative h-28">
             {profile?.stampUrl && (
               <img
                 src={profile.stampUrl}
                 alt=""
-                className="absolute left-1/2 top-1 h-20 w-20 -translate-x-1/2 object-contain opacity-80"
+                className="absolute left-1/2 top-1 h-28 w-28 -translate-x-1/2 object-contain opacity-80"
               />
             )}
             {profile?.signatureUrl && (
               <img
                 src={profile.signatureUrl}
                 alt=""
-                className="absolute left-1/2 top-2 h-16 w-auto -translate-x-1/2 object-contain"
+                className="absolute left-1/2 top-4 h-20 w-auto -translate-x-1/2 object-contain"
               />
             )}
           </div>
           <div className="border-t border-line pt-1 font-medium">
             {profile?.ownerName ?? profile?.businessName ?? ""}
           </div>
+          {/* Jabatan per jenis dokumen. Sengaja "Owner"/"Pemilik", BUKAN
+              Direktur/CEO PT — dipakai hanya jika PT sudah resmi berdiri. */}
+          {(() => {
+            const isFinance =
+              doc.docLabel === "Invoice" || doc.docLabel === "Kuitansi";
+            const title = isFinance
+              ? profile?.businessName
+                ? `Pemilik ${profile.businessName}`
+                : "Pemilik"
+              : "Owner / Project Lead";
+            return <div className="text-[10.5px] text-ink-secondary">{title}</div>;
+          })()}
         </div>
       </section>
 

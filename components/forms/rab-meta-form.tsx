@@ -39,9 +39,12 @@ export function RabMetaForm({
       <Field label="Judul RAB" htmlFor="title">
         <Input id="title" {...register("title")} />
       </Field>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Field label="Diskon (IDR)" htmlFor="discount">
           <Input id="discount" inputMode="numeric" className="tabular" {...register("discount")} />
+        </Field>
+        <Field label="Keuntungan (%)" htmlFor="profitPercent">
+          <Input id="profitPercent" inputMode="numeric" className="tabular" {...register("profitPercent")} />
         </Field>
         <Field label="Pajak (%)" htmlFor="taxPercent">
           <Input id="taxPercent" inputMode="numeric" className="tabular" {...register("taxPercent")} />
@@ -51,7 +54,7 @@ export function RabMetaForm({
         </Field>
       </div>
       <div className="flex items-center gap-2">
-        <Button type="submit" size="sm" disabled={isSubmitting}>
+        <Button type="submit" size="sm" loading={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : "Simpan & Hitung Ulang"}
         </Button>
         {saved && <span className="text-[13px] text-success">Tersimpan.</span>}

@@ -84,7 +84,7 @@ export function PaymentForm({
         </div>
       )}
       <div className="flex items-center gap-2">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" loading={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : "Catat Pembayaran"}
         </Button>
         <Button type="button" variant="secondary" onClick={() => router.back()}>

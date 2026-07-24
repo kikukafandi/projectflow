@@ -7,6 +7,7 @@ import { clients, projects } from "@/db/schema";
 import { PageHeader } from "@/components/page-header";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import {
   priorityLabels,
@@ -14,7 +15,13 @@ import {
   projectTypeLabels,
 } from "@/lib/labels";
 import { formatDate, formatIDR } from "@/lib/utils";
-import { archiveProject, deleteProject, unarchiveProject } from "../actions";
+import { isAdmin, requireUser } from "@/lib/session";
+import {
+  archiveProject,
+  deleteProject,
+  forceDeleteProject,
+  unarchiveProject,
+} from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +31,9 @@ const TABS: { label: string; href?: string }[] = [
   { label: "RAB", href: "rab" },
   { label: "Quotations", href: "quotations" },
   { label: "Tasks", href: "tasks" },
-  { label: "Invoices" },
-  { label: "Files" },
-  { label: "Activity" },
+  { label: "Invoices", href: "invoices" },
+  { label: "Files", href: "files" },
+  { label: "Activity", href: "activity" },
 ];
 
 function Row({ label, value }: { label: string; value?: string | null }) {
@@ -54,6 +61,7 @@ export default async function ProjectDetailPage({
   if (!row) notFound();
   const p = row.project;
   const { archived } = await searchParams;
+  const admin = isAdmin(await requireUser());
   const archive = archiveProject.bind(null, id);
   const isArchived = p.status === "archived";
 
@@ -83,14 +91,27 @@ export default async function ProjectDetailPage({
               </form>
             )}
             <form action={deleteProject.bind(null, id)}>
-              <Button
-                type="submit"
+              <ConfirmSubmit
                 variant="ghost"
                 className="text-danger hover:bg-danger-soft"
+                title={`Hapus proyek ${p.name}?`}
+                message="Scope, RAB, quotation, dan task di dalamnya ikut terhapus permanen. Kalau proyek ini sudah punya invoice, sistem akan mengarsipkannya saja."
               >
                 <Trash2 /> Hapus
-              </Button>
+              </ConfirmSubmit>
             </form>
+            {admin && (
+              <form action={forceDeleteProject.bind(null, id)}>
+                <ConfirmSubmit
+                  variant="danger"
+                  confirmLabel="Ya, hapus paksa"
+                  title={`Hapus PAKSA proyek ${p.name}?`}
+                  message="Scope, RAB, quotation, task, DAN semua invoice + pembayaran + kwitansi proyek ini ikut terhapus PERMANEN. Tidak bisa dikembalikan. Hanya untuk admin."
+                >
+                  <Trash2 /> Hapus paksa
+                </ConfirmSubmit>
+              </form>
+            )}
           </>
         }
       />
