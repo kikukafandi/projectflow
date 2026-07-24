@@ -73,6 +73,50 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Transisi masuk tiap halaman — fade + naik sedikit, halus (bukan ganti mendadak). */
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.page-enter {
+  animation: pageIn 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Kartu: transisi halus. Efek angkat/tekan HANYA saat kartu dibungkus <a>
+   (kartu yang bisa diklik), jadi kartu di dalam form tidak ikut memantul. */
+.card-tap {
+  transition:
+    transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 160ms ease;
+}
+@media (hover: hover) {
+  a:hover > .card-tap {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+}
+a:active > .card-tap {
+  transform: scale(0.985);
+}
+
+/* Hormati preferensi kurangi-gerak: matikan animasi & transisi. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* A4 document sheet + print stylesheet (PRD §27). */
 .doc-sheet {
   width: 210mm;

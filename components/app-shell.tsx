@@ -8,6 +8,7 @@ import { signOut } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { DesktopSidebar, MobileDrawer } from "./app-sidebar";
 import { NavProgress } from "./nav-progress";
+import { PageTransition } from "./page-transition";
 import { bottomNavHrefs, navItems } from "./nav";
 
 export function AppShell({
@@ -102,7 +103,7 @@ export function AppShell({
         </header>
 
         <div className="flex-1 px-4 py-4 pb-24 md:px-6 lg:px-8 lg:py-6 lg:pb-8">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </div>
 
         {/* Bottom nav (DESIGN.MD §30) */}

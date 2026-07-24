@@ -8,7 +8,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-[16px] border border-[#ECECE8] bg-surface shadow-[0_2px_8px_rgba(24,24,27,0.04)]",
+        "card-tap rounded-[16px] border border-[#ECECE8] bg-surface shadow-[0_2px_8px_rgba(24,24,27,0.04)]",
         className,
       )}
       {...props}
