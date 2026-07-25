@@ -55,15 +55,29 @@ export function NavProgress() {
   }, [pathname]);
 
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-0.5"
-      style={{ opacity: visible ? 1 : 0, transition: "opacity 200ms" }}
-    >
+    <>
       <div
-        className="h-full bg-primary"
-        style={{ width: `${width}%`, transition: "width 300ms ease" }}
-      />
-    </div>
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-1 bg-primary-soft"
+        style={{ opacity: visible ? 1 : 0, transition: "opacity 150ms" }}
+      >
+        <div
+          className="h-full bg-primary shadow-[0_1px_8px_rgba(255,122,26,0.8)]"
+          style={{ width: `${width}%`, transition: "width 300ms ease" }}
+        />
+      </div>
+      <div
+        role="status"
+        aria-live="polite"
+        className="pointer-events-none fixed left-1/2 top-3 z-[61] -translate-x-1/2 rounded-full border border-primary/20 bg-surface px-3 py-1 text-xs font-medium text-primary shadow-md"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: `translate(-50%, ${visible ? "0" : "-8px"})`,
+          transition: "opacity 150ms, transform 150ms",
+        }}
+      >
+        Memuat halaman…
+      </div>
+    </>
   );
 }

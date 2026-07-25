@@ -35,11 +35,11 @@ export function RabMetaForm({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <Field label="Judul RAB" htmlFor="title">
         <Input id="title" {...register("title")} />
       </Field>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="grid gap-3 min-[620px]:grid-cols-2">
         <Field label="Diskon (IDR)" htmlFor="discount">
           <Input id="discount" inputMode="numeric" className="tabular" {...register("discount")} />
         </Field>
@@ -53,7 +53,7 @@ export function RabMetaForm({
           <Input id="additionalCost" inputMode="numeric" className="tabular" {...register("additionalCost")} />
         </Field>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button type="submit" size="sm" loading={isSubmitting}>
           {isSubmitting ? "Menyimpan…" : "Simpan & Hitung Ulang"}
         </Button>

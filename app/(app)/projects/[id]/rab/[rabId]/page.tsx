@@ -76,7 +76,12 @@ export default async function RabEditorPage({
         description={rab.title ?? undefined}
         actions={
           <>
-            {isDraft ? (
+            <Button asChild variant="secondary">
+              <Link href={`/print/rab/${rabId}?back=/projects/${id}/rab/${rabId}`}>
+                <Printer /> {isDraft ? "Preview" : "Cetak"}
+              </Link>
+            </Button>
+            {isDraft && (
               <form action={finalizeRab.bind(null, id, rabId)}>
                 <ConfirmSubmit
                   variant="primary"
@@ -87,12 +92,6 @@ export default async function RabEditorPage({
                   <CheckCircle2 /> Finalkan
                 </ConfirmSubmit>
               </form>
-            ) : (
-              <Button asChild variant="secondary">
-                <Link href={`/print/rab/${rabId}?back=/projects/${id}/rab/${rabId}`}>
-                  <Printer /> Cetak
-                </Link>
-              </Button>
             )}
             <form action={deleteRab.bind(null, id, rabId)}>
               <ConfirmSubmit
@@ -112,8 +111,8 @@ export default async function RabEditorPage({
         <StatusBadge map={rabStatus} value={rab.status} />
         {isDraft && (
           <span className="rounded-full bg-warning-soft px-2.5 py-0.5 text-[12px] text-[#a9760f]">
-            Draft — belum bernomor. Ini ruang hitung internal; finalkan untuk
-            dapat nomor & cetak.
+            Draft — belum bernomor. Gunakan Preview untuk melihat hasil cetak;
+            finalkan untuk nomor resmi.
           </span>
         )}
       </div>

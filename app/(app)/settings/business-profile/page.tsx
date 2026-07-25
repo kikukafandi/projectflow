@@ -28,6 +28,8 @@ export default async function BusinessProfilePage() {
         slogan: profile.slogan ?? undefined,
         primaryColor: profile.primaryColor ?? undefined,
         logoUrl: profile.logoUrl ?? undefined,
+        showLogoInDocumentHeader: profile.showLogoInDocumentHeader,
+        showNpwpInDocumentHeader: profile.showNpwpInDocumentHeader,
         signatureUrl: profile.signatureUrl ?? undefined,
         stampUrl: profile.stampUrl ?? undefined,
         defaultNote: profile.defaultNote ?? undefined,

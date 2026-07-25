@@ -1,0 +1,2 @@
+ALTER TABLE "business_profiles" ADD COLUMN "show_logo_in_document_header" boolean DEFAULT true NOT NULL;--> statement-breakpoint
+ALTER TABLE "business_profiles" ADD COLUMN "show_npwp_in_document_header" boolean DEFAULT false NOT NULL;

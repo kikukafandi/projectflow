@@ -6,6 +6,12 @@ export const businessProfiles = pgTable("business_profiles", {
   businessName: text("business_name").notNull(),
   ownerName: text("owner_name"),
   logoUrl: text("logo_url"),
+  showLogoInDocumentHeader: boolean("show_logo_in_document_header")
+    .default(true)
+    .notNull(),
+  showNpwpInDocumentHeader: boolean("show_npwp_in_document_header")
+    .default(false)
+    .notNull(),
   address: text("address"),
   city: text("city"),
   province: text("province"),

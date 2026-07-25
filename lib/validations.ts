@@ -181,6 +181,8 @@ export const businessProfileSchema = z.object({
   primaryColor: optionalStr,
   // Document identity images (PRD §27.3). URLs — hosting is out of scope for now.
   logoUrl: optionalStr,
+  showLogoInDocumentHeader: z.boolean().default(true),
+  showNpwpInDocumentHeader: z.boolean().default(false),
   signatureUrl: optionalStr,
   stampUrl: optionalStr,
   defaultNote: optionalStr,

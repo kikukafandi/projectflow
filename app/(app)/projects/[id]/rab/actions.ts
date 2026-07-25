@@ -30,7 +30,11 @@ async function recomputeRab(rabId: string) {
   const sectionIds = sections.map((s) => s.id);
   const items = sectionIds.length
     ? await db
-        .select({ quantity: rabItems.quantity, unitPrice: rabItems.unitPrice })
+        .select({
+          id: rabItems.id,
+          quantity: rabItems.quantity,
+          unitPrice: rabItems.unitPrice,
+        })
         .from(rabItems)
         .where(inArray(rabItems.sectionId, sectionIds))
     : [];
@@ -41,6 +45,21 @@ async function recomputeRab(rabId: string) {
     additionalCost: rab.additionalCost,
     profitPercent: rab.profitPercent,
   });
+  await Promise.all(
+    items.map((item) =>
+      db
+        .update(rabItems)
+        .set({
+          weight: String(
+            totals.subtotal > 0
+              ? (lineSubtotal(item.quantity, item.unitPrice) / totals.subtotal) * 100
+              : 0,
+          ),
+          updatedAt: new Date(),
+        })
+        .where(eq(rabItems.id, item.id)),
+    ),
+  );
   await db
     .update(rabs)
     .set({

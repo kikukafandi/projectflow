@@ -116,9 +116,25 @@ export function BusinessProfileForm({
       <Card>
         <CardContent className="grid gap-4">
           <CardTitle>Default Dokumen</CardTitle>
-          <Field label="URL Logo" htmlFor="logoUrl" hint="Tampil di header dokumen.">
+          <Field label="URL Logo" htmlFor="logoUrl" hint="Gunakan logo/wordmark transparan agar tajam pada dokumen.">
             <Input id="logoUrl" placeholder="https://…" {...register("logoUrl")} />
           </Field>
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              className="size-4 accent-primary"
+              {...register("showLogoInDocumentHeader")}
+            />
+            Tampilkan logo di header dokumen
+          </label>
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              className="size-4 accent-primary"
+              {...register("showNpwpInDocumentHeader")}
+            />
+            Tampilkan NPWP di header dokumen
+          </label>
           <Field label="URL Tanda Tangan" htmlFor="signatureUrl">
             <Input id="signatureUrl" placeholder="https://…" {...register("signatureUrl")} />
           </Field>

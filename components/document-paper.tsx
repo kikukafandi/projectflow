@@ -1,7 +1,14 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
+import { useState } from "react";
 import type { BusinessProfile, DocData } from "@/lib/documents";
 import { toNum } from "@/lib/money";
 import { formatIDR } from "@/lib/utils";
+
+function validColor(value: string | null | undefined): value is string {
+  return Boolean(value && /^#[0-9a-f]{6}$/i.test(value));
+}
 
 /**
  * A4 document sheet (PRD §27). Print-only styling lives in globals.css under
@@ -14,16 +21,19 @@ export function DocumentPaper({
   profile: BusinessProfile | null;
   doc: DocData;
 }) {
-  const accent = profile?.primaryColor || "#FF7A1A";
+  const [logoFailed, setLogoFailed] = useState(false);
+  const accent = validColor(profile?.primaryColor) ? profile.primaryColor : "#FF7A1A";
   const address = [
     profile?.address,
-    [profile?.city, profile?.province, profile?.postalCode]
-      .filter(Boolean)
-      .join(", "),
+    [profile?.city, profile?.province, profile?.postalCode].filter(Boolean).join(", "),
   ].filter(Boolean);
-  const contact = [profile?.phone || profile?.whatsapp, profile?.email, profile?.website]
-    .filter(Boolean)
-    .join(" · ");
+  const contacts = [
+    profile?.whatsapp ? `WhatsApp: ${profile.whatsapp}` : null,
+    profile?.phone && profile.phone !== profile.whatsapp ? `Telepon: ${profile.phone}` : null,
+    profile?.email ?? null,
+    profile?.website ?? null,
+  ].filter((value): value is string => Boolean(value));
+  const showLogo = Boolean(profile?.logoUrl && profile.showLogoInDocumentHeader && !logoFailed);
   const hasUnitColumn = doc.sections.some((s) =>
     s.items.some((i) => toNum(i.quantity) !== 1 || i.unit),
   );
@@ -31,34 +41,32 @@ export function DocumentPaper({
   return (
     <article className="doc-sheet mx-auto bg-white text-ink">
       <header
-        className="flex items-start justify-between gap-6 border-b-2 pb-4"
+        className="grid grid-cols-[minmax(0,1fr)_minmax(145px,0.6fr)] items-start gap-6 border-b-2 pb-4"
         style={{ borderColor: accent }}
       >
-        <div className="flex items-start gap-3">
-          {profile?.logoUrl && (
-            <img src={profile.logoUrl} alt="" className="h-12 w-auto object-contain" />
-          )}
-          <div>
-            <div className="text-[17px] font-semibold leading-tight">
-              {profile?.businessName ?? "Business Profile belum diisi"}
-            </div>
-            {profile?.slogan && (
-              <div className="text-[11px] text-ink-muted">{profile.slogan}</div>
-            )}
-            {address.map((line) => (
-              <div key={line} className="text-[11px] text-ink-secondary">
-                {line}
+        <section className="flex min-w-0 items-start gap-3">
+          <div className="shrink-0">
+            {showLogo ? (
+              <img
+                src={profile?.logoUrl ?? undefined}
+                alt={profile?.businessName ?? "Logo bisnis"}
+                className="h-14 max-w-40 object-contain object-left"
+                onError={() => setLogoFailed(true)}
+              />
+            ) : (
+              <div className="max-w-44 break-words text-[17px] font-semibold leading-tight" style={{ color: accent }}>
+                {profile?.businessName ?? "Identitas Bisnis"}
               </div>
-            ))}
-            {contact && (
-              <div className="text-[11px] text-ink-secondary">{contact}</div>
-            )}
-            {profile?.npwp && (
-              <div className="text-[11px] text-ink-secondary">NPWP: {profile.npwp}</div>
             )}
           </div>
-        </div>
-        <div className="text-right">
+          <div className="min-w-0 break-words text-[11px] leading-relaxed text-ink-secondary">
+            {profile?.slogan && <div className="font-medium text-ink">{profile.slogan}</div>}
+            {address.map((line) => <div key={line}>{line}</div>)}
+            {contacts.map((contact) => <div key={contact}>{contact}</div>)}
+            {profile?.showNpwpInDocumentHeader && profile.npwp && <div>NPWP: {profile.npwp}</div>}
+          </div>
+        </section>
+        <section className="min-w-0 break-words text-right">
           <div
             className="text-[20px] font-semibold uppercase leading-tight"
             style={{ color: accent }}
@@ -66,7 +74,12 @@ export function DocumentPaper({
             {doc.docLabel}
           </div>
           <div className="tabular text-[13px] font-medium">{doc.number}</div>
-        </div>
+          {doc.number === "DRAFT" && (
+            <div className="mt-1 inline-flex rounded border border-warning px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-warning">
+              BELUM FINAL
+            </div>
+          )}
+        </section>
       </header>
 
       <section className="mt-5 flex justify-between gap-8">
@@ -87,11 +100,11 @@ export function DocumentPaper({
             <div className="text-[11.5px] text-ink-muted">—</div>
           )}
         </div>
-        <dl className="shrink-0 text-right text-[11.5px]">
+        <dl className="grid shrink-0 grid-cols-[auto_minmax(125px,1fr)] gap-x-3 text-[11.5px]">
           {doc.meta.map((m) => (
-            <div key={m.label} className="flex justify-end gap-3">
-              <dt className="text-ink-muted">{m.label}</dt>
-              <dd className="min-w-[110px] text-left font-medium">{m.value}</dd>
+            <div key={m.label} className="contents">
+              <dt className="text-right text-ink-muted">{m.label}</dt>
+              <dd className="min-w-0 break-words font-medium">{m.value}</dd>
             </div>
           ))}
         </dl>
