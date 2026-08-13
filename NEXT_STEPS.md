@@ -69,10 +69,26 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
     - Sisa: **Vercel Blob upload dilewati** — butuh `@vercel/blob` + `BLOB_READ_WRITE_TOKEN` yang belum ada, jadi tidak bisa diverifikasi. Sebagai gantinya logo/tanda tangan/stempel diisi via URL di Business Profile, cukup untuk dokumen. Tambahkan upload saat token tersedia.
     - Sisa: spreadsheet export RAB (ExcelJS) — belum dikerjakan.
 
+## ⏸️ Berikutnya — Fase 9: Agenda & Kalender kerja (spec siap, MENUNGGU REVIEW)
+
+Penjadwalan yang bukan task proyek: meeting, survei lokasi, agenda kerja lain.
+Desain lengkap: `docs/superpowers/specs/2026-08-13-agenda-kalender-design.md` (commit `3e1a2ea`).
+
+Ringkas: tabel `events` (`date` + `time` terpisah, BUKAN `timestamptz` — hindari konversi UTC),
+halaman `/calendar` tampilan minggu berkolom jam, `lib/agenda.ts` + `npm run check:agenda`,
+integrasi ke Daily Focus & Dashboard, item nav "Kalender".
+
+Langkah selanjutnya: review spec → bikin rencana implementasi (skill writing-plans) → kerjakan.
+
+Belum diputuskan (dua file sengaja tidak di-commit):
+- `pages/_document.tsx` — proyek ini App Router, `lang="id"` sudah ada di `app/layout.tsx`. Kandidat hapus.
+- `icon_projrctflow.png` di root — sudah digantikan `app/icon.png`. Kandidat hapus.
+
 ## Perintah verifikasi
 ```bash
 npm run typecheck && npm run build
-npm run db:push      # sinkron schema ke Neon
+npm run check:planner   # self-check logika board & timeline
+npm run db:push         # sinkron schema ke Neon
 ```
 
 ## Definition of Done per fitur (PRD §49)
