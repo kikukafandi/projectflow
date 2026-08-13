@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { navItems } from "./nav";
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   return (
     <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
       {navItems.map((item) => {

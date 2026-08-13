@@ -22,7 +22,14 @@ import {
   receipts,
 } from "@/db/schema";
 import { computeRabTotals, toNum } from "@/lib/money";
-import { paymentMethodLabels } from "@/lib/labels";
+import { terbilangRupiah } from "@/lib/terbilang";
+import {
+  invoiceStatus,
+  paymentMethodLabels,
+  quotationStatus,
+  rabStatus,
+  receiptStatus,
+} from "@/lib/labels";
 import { formatDate, formatIDR } from "@/lib/utils";
 
 export const DOC_TYPES = ["rab", "quotation", "invoice", "receipt"] as const;
@@ -48,10 +55,12 @@ export type DocTotal = { label: string; value: string; strong?: boolean };
 export type DocData = {
   docLabel: string;
   number: string;
+  status?: { label: string; tone: "neutral" | "positive" | "attention" | "critical" };
   meta: { label: string; value: string }[];
   recipient: { name: string; lines: string[] } | null;
   sections: DocSection[];
   totals: DocTotal[];
+  showPrice?: boolean;
   amountInWords?: string | null;
   notes?: string | null;
   terms?: string | null;
@@ -80,6 +89,21 @@ function bankOf(b: typeof businessBankAccounts.$inferSelect | null | undefined) 
         accountHolder: b.accountHolder,
       }
     : null;
+}
+
+function documentStatus(
+  value: string,
+  labels: Record<string, { label: string; tone: string }>,
+): DocData["status"] {
+  const status = labels[value];
+  if (!status) return undefined;
+  const tones: Record<string, NonNullable<DocData["status"]>["tone"]> = {
+    green: "positive",
+    yellow: "attention",
+    orange: "attention",
+    red: "critical",
+  };
+  return { label: status.label, tone: tones[status.tone] ?? "neutral" };
 }
 
 function clientBlock(c: typeof clients.$inferSelect | undefined) {
@@ -144,6 +168,7 @@ export async function loadDocument(
       doc: {
         docLabel: "Rencana Anggaran Biaya",
         number: rab.number ?? "DRAFT",
+        status: documentStatus(rab.status, rabStatus),
         meta: [
           { label: "Tanggal", value: formatDate(rab.createdAt) },
           { label: "Proyek", value: project?.name ?? "—" },
@@ -158,7 +183,9 @@ export async function loadDocument(
           rab.additionalCost,
           rab.profitPercent,
         ),
-        notes: rab.notes,
+         showPrice: rab.showPrice,
+         amountInWords: rab.showPrice ? terbilangRupiah(t.grandTotal) : null,
+         notes: rab.notes,
         bank: null,
         signedLabel: "Disusun oleh",
       },
@@ -192,8 +219,9 @@ export async function loadDocument(
     return {
       profile,
       doc: {
-        docLabel: "Penawaran Harga",
+        docLabel: q.showPrice ? "Penawaran Harga" : "Penawaran Ruang Lingkup",
         number: q.number,
+        status: documentStatus(q.status, quotationStatus),
         meta: [
           { label: "Tanggal", value: formatDate(q.createdAt) },
           { label: "Proyek", value: project?.name ?? "—" },
@@ -201,6 +229,8 @@ export async function loadDocument(
         ],
         recipient: clientBlock(client),
         sections: docSections,
+        showPrice: q.showPrice,
+        amountInWords: q.showPrice ? terbilangRupiah(q.grandTotal ?? "0") : null,
         totals: [
           { label: "Subtotal", value: formatIDR(q.subtotal) },
           { label: "Grand Total", value: formatIDR(q.grandTotal), strong: true },
@@ -261,6 +291,7 @@ export async function loadDocument(
       doc: {
         docLabel: "Invoice",
         number: inv.number,
+        status: documentStatus(inv.status, invoiceStatus),
         meta: [
           { label: "Tanggal", value: formatDate(inv.issueDate) },
           { label: "Jatuh tempo", value: formatDate(inv.dueDate) },
@@ -269,6 +300,7 @@ export async function loadDocument(
         recipient: clientBlock(client),
         sections: [{ name: "", items }],
         totals,
+        amountInWords: terbilangRupiah(inv.total ?? "0"),
         notes: inv.notes,
         bank: bankOf(bank ?? (await primaryBank())),
         signedLabel: "Hormat kami",
@@ -288,11 +320,12 @@ export async function loadDocument(
     : [];
   return {
     profile,
-    doc: {
-      docLabel: "Kuitansi",
-      number: rc.number,
-      meta: [
-        { label: "Tanggal", value: formatDate(pay?.paidAt) },
+      doc: {
+        docLabel: "Kuitansi",
+        number: rc.number,
+        status: documentStatus(rc.status, receiptStatus),
+        meta: [
+          { label: "Tanggal", value: formatDate(pay?.paidAt) },
         { label: "Invoice", value: inv?.number ?? "—" },
         {
           label: "Metode",

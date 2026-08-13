@@ -305,6 +305,7 @@ export default async function QuotationEditorPage({
                 action={updateQuotationMeta.bind(null, id, qid)}
                 disabled={approved}
                 defaultValues={{
+                  showPrice: q.showPrice,
                   validUntil: q.validUntil ?? undefined,
                   notes: q.notes ?? undefined,
                   terms: q.terms ?? undefined,

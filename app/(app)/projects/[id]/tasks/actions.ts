@@ -81,6 +81,17 @@ async function wipLimit(): Promise<number> {
   return Number.isFinite(n) && n > 0 ? n : DEFAULT_WIP;
 }
 
+/** True when the task still has unchecked mandatory checklist items (PRD §37.6). */
+async function blockedByChecklist(taskId: string): Promise<boolean> {
+  const required = await db
+    .select({ done: taskChecklists.done })
+    .from(taskChecklists)
+    .where(
+      and(eq(taskChecklists.taskId, taskId), eq(taskChecklists.required, true)),
+    );
+  return required.some((c) => !c.done);
+}
+
 /** Move a task to a new status. Enforces WIP limit for in_progress (PRD §22). */
 export async function moveTask(
   projectId: string,
@@ -102,6 +113,9 @@ export async function moveTask(
       redirect(`/projects/${projectId}/tasks?wip=${limit}`);
     }
   }
+  if (status === "done" && (await blockedByChecklist(taskId))) {
+    redirect(`/projects/${projectId}/tasks/${taskId}?dod=1`);
+  }
 
   await db
     .update(tasks)
@@ -122,6 +136,128 @@ export async function moveTask(
     });
   }
   await recomputeProjectProgress(projectId);
+  revalidatePath(`/projects/${projectId}/tasks`);
+  revalidatePath(`/projects/${projectId}/tasks/${taskId}`);
+}
+
+// ---- Board & timeline (drag & drop) ----
+// Dipanggil dari komponen klien, jadi mengembalikan pesan error alih-alih redirect:
+// board yang membatalkan perpindahan butuh alasannya, bukan halaman baru.
+
+/** Drop kartu ke sebuah kolom, sekaligus menyimpan urutan baru kolom itu. */
+export async function moveTaskBoard(
+  projectId: string,
+  taskId: string,
+  status: string,
+  orderedIds: string[],
+): Promise<{ error: string } | void> {
+  await requireUser();
+  if (!taskStatusValues.includes(status as never)) return;
+  const next = status as (typeof taskStatusValues)[number];
+
+  const [current] = await db
+    .select({ status: tasks.status })
+    .from(tasks)
+    .where(and(eq(tasks.id, taskId), eq(tasks.projectId, projectId)));
+  if (!current) return { error: "Task tidak ditemukan." };
+
+  if (next === "in_progress" && current.status !== "in_progress") {
+    const inProgress = await db
+      .select({ id: tasks.id })
+      .from(tasks)
+      .where(eq(tasks.status, "in_progress"));
+    const limit = await wipLimit();
+    if (inProgress.length >= limit) {
+      return {
+        error: `WIP limit tercapai (maks ${limit} task In Progress). Selesaikan task aktif dulu, atau paksa mulai dari halaman task.`,
+      };
+    }
+  }
+  if (next === "done" && (await blockedByChecklist(taskId))) {
+    return {
+      error: "Checklist wajib belum selesai — buka task untuk menuntaskannya.",
+    };
+  }
+
+  if (next !== current.status) {
+    await db
+      .update(tasks)
+      .set({
+        status: next,
+        completedAt: next === "done" ? new Date() : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(tasks.id, taskId));
+  }
+  // ponytail: satu UPDATE per kartu di kolom tujuan. Kolomnya puluhan baris,
+  // bukan ribuan — ganti ke satu UPDATE ... CASE kalau board mulai berat.
+  await Promise.all(
+    orderedIds.map((id, i) =>
+      db.update(tasks).set({ position: i }).where(eq(tasks.id, id)),
+    ),
+  );
+
+  if (next !== current.status) await recomputeProjectProgress(projectId);
+  revalidatePath(`/projects/${projectId}/tasks`);
+}
+
+/** Tambah task langsung dari dasar kolom board (tanpa pindah halaman). */
+export async function quickCreateTask(
+  projectId: string,
+  status: string,
+  title: string,
+): Promise<{ error: string } | void> {
+  await requireUser();
+  const name = title.trim();
+  if (!name) return;
+  if (!taskStatusValues.includes(status as never)) return;
+  const next = status as (typeof taskStatusValues)[number];
+
+  const col = await db
+    .select({ id: tasks.id })
+    .from(tasks)
+    .where(and(eq(tasks.projectId, projectId), eq(tasks.status, next)));
+  await db
+    .insert(tasks)
+    .values({ projectId, title: name, status: next, position: col.length });
+  await recomputeProjectProgress(projectId);
+  revalidatePath(`/projects/${projectId}/tasks`);
+}
+
+/** Ubah judul task di tempat (inline edit di kartu board). */
+export async function renameTask(
+  projectId: string,
+  taskId: string,
+  title: string,
+): Promise<void> {
+  await requireUser();
+  const name = title.trim();
+  if (!name) return;
+  await db
+    .update(tasks)
+    .set({ title: name, updatedAt: new Date() })
+    .where(and(eq(tasks.id, taskId), eq(tasks.projectId, projectId)));
+  revalidatePath(`/projects/${projectId}/tasks`);
+}
+
+/** Geser/rentangkan bar task di timeline. Tanggal ISO `YYYY-MM-DD`. */
+export async function setTaskDates(
+  projectId: string,
+  taskId: string,
+  startDate: string | null,
+  deadline: string | null,
+): Promise<{ error: string } | void> {
+  await requireUser();
+  const iso = /^\d{4}-\d{2}-\d{2}$/;
+  if (startDate && !iso.test(startDate)) return { error: "Tanggal tidak valid." };
+  if (deadline && !iso.test(deadline)) return { error: "Tanggal tidak valid." };
+  if (startDate && deadline && deadline < startDate) {
+    return { error: "Tanggal selesai mendahului tanggal mulai." };
+  }
+  await db
+    .update(tasks)
+    .set({ startDate, deadline, updatedAt: new Date() })
+    .where(and(eq(tasks.id, taskId), eq(tasks.projectId, projectId)));
   revalidatePath(`/projects/${projectId}/tasks`);
   revalidatePath(`/projects/${projectId}/tasks/${taskId}`);
 }
@@ -173,14 +309,7 @@ export async function markTaskDone(
   taskId: string,
 ): Promise<void> {
   const user = await requireUser();
-  const required = await db
-    .select()
-    .from(taskChecklists)
-    .where(
-      and(eq(taskChecklists.taskId, taskId), eq(taskChecklists.required, true)),
-    );
-  const blocked = required.some((c) => !c.done);
-  if (blocked) {
+  if (await blockedByChecklist(taskId)) {
     redirect(`/projects/${projectId}/tasks/${taskId}?dod=1`);
   }
   await db

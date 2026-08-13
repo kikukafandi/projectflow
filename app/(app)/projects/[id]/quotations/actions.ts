@@ -47,6 +47,7 @@ export async function generateQuotationFromRab(
       rabId,
       number,
       status: "draft",
+      showPrice: rab.showPrice,
       subtotal: rab.subtotal ?? "0",
       grandTotal: rab.grandTotal ?? "0",
     })
@@ -110,6 +111,7 @@ export async function updateQuotationMeta(
     .update(quotations)
     .set({
       validUntil: parsed.data.validUntil,
+      showPrice: parsed.data.showPrice,
       notes: parsed.data.notes,
       terms: parsed.data.terms,
       updatedAt: new Date(),
@@ -189,6 +191,7 @@ export async function reviseQuotation(
       rabId: q.rabId,
       number: newNumber,
       status: "draft",
+      showPrice: q.showPrice,
       currentVersion: newVersion,
       validUntil: q.validUntil,
       subtotal: q.subtotal,

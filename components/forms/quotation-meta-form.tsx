@@ -47,6 +47,10 @@ export function QuotationMetaForm({
       <Field label="Berlaku Sampai" htmlFor="validUntil">
         <Input id="validUntil" type="date" disabled={disabled} {...register("validUntil")} />
       </Field>
+      <label className="flex items-center gap-2 text-sm text-ink">
+        <input type="checkbox" disabled={disabled} {...register("showPrice")} />
+        Tampilkan harga pada penawaran
+      </label>
       <Field label="Catatan" htmlFor="notes">
         <Textarea id="notes" disabled={disabled} {...register("notes")} />
       </Field>

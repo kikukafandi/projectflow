@@ -273,6 +273,7 @@ export type ScopeFeatureInput = z.input<typeof scopeFeatureSchema>;
 
 export const rabMetaSchema = z.object({
   title: optionalStr,
+  showPrice: z.boolean().default(true),
   discount: optionalMoney,
   taxPercent: optionalMoney,
   additionalCost: optionalMoney,
@@ -294,6 +295,7 @@ export const rabItemSchema = z.object({
 export type RabItemInput = z.input<typeof rabItemSchema>;
 
 export const quotationMetaSchema = z.object({
+  showPrice: z.boolean().default(true),
   validUntil: optionalStr,
   notes: optionalStr,
   terms: optionalStr,

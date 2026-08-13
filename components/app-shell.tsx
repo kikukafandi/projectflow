@@ -22,7 +22,7 @@ export function AppShell({
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   const current = navItems.find(
     (i) => pathname === i.href || pathname.startsWith(i.href + "/"),

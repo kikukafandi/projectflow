@@ -255,6 +255,7 @@ export default async function RabEditorPage({
                 action={updateRabMeta.bind(null, id, rabId)}
                 defaultValues={{
                   title: rab.title ?? undefined,
+                  showPrice: rab.showPrice,
                   discount: rab.discount ?? "0",
                   taxPercent: rab.taxPercent ?? "0",
                   additionalCost: rab.additionalCost ?? "0",

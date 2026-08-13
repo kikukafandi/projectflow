@@ -138,6 +138,7 @@ export async function updateRabMeta(
     .update(rabs)
     .set({
       title: parsed.data.title,
+      showPrice: parsed.data.showPrice,
       discount: parsed.data.discount ?? "0",
       taxPercent: parsed.data.taxPercent ?? "0",
       additionalCost: parsed.data.additionalCost ?? "0",

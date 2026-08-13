@@ -39,6 +39,14 @@ export function RabMetaForm({
       <Field label="Judul RAB" htmlFor="title">
         <Input id="title" {...register("title")} />
       </Field>
+      <label className="flex items-center gap-2 text-sm text-ink">
+        <input
+          type="checkbox"
+          {...register("showPrice")}
+          className="size-4 accent-[#FF7A1A]"
+        />
+        Tampilkan harga pada RAB eksternal
+      </label>
       <div className="grid gap-3 min-[620px]:grid-cols-2">
         <Field label="Diskon (IDR)" htmlFor="discount">
           <Input id="discount" inputMode="numeric" className="tabular" {...register("discount")} />

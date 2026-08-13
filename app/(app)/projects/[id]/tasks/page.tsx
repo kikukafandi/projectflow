@@ -6,24 +6,37 @@ import { db } from "@/db";
 import { projects, taskChecklists, tasks } from "@/db/schema";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TaskMoveSelect } from "@/components/task-move-select";
-import { priorityLabels, taskBoardColumns, taskStatus } from "@/lib/labels";
-import { formatDate } from "@/lib/utils";
-import { generateTasksFromScope, moveTask } from "./actions";
+import { TaskBoard } from "@/components/task-board";
+import { TaskTimeline } from "@/components/task-timeline";
+import { taskBoardColumns } from "@/lib/labels";
+import {
+  generateTasksFromScope,
+  moveTask,
+  moveTaskBoard,
+  quickCreateTask,
+  renameTask,
+  setTaskDates,
+} from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const views = [
+  { key: "board", label: "Board" },
+  { key: "timeline", label: "Timeline" },
+] as const;
 
 export default async function TaskBoardPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ wip?: string }>;
+  searchParams: Promise<{ wip?: string; view?: string }>;
 }) {
   const { id } = await params;
-  const { wip } = await searchParams;
+  const { wip, view: viewParam } = await searchParams;
+  const view = views.find((v) => v.key === viewParam)?.key ?? "board";
+
   const [project] = await db.select().from(projects).where(eq(projects.id, id));
   if (!project) notFound();
 
@@ -33,14 +46,26 @@ export default async function TaskBoardPage({
       .from(tasks)
       .where(eq(tasks.projectId, id))
       .orderBy(asc(tasks.position), asc(tasks.createdAt)),
-    db.select().from(taskChecklists),
+    db
+      .select({ taskId: taskChecklists.taskId, done: taskChecklists.done })
+      .from(taskChecklists)
+      .innerJoin(tasks, eq(tasks.id, taskChecklists.taskId))
+      .where(eq(tasks.projectId, id)),
   ]);
 
-  const checkOf = (taskId: string) => {
-    const cs = checks.filter((c) => c.taskId === taskId);
-    return { total: cs.length, done: cs.filter((c) => c.done).length };
-  };
-  const colTasks = (status: string) => rows.filter((t) => t.status === status);
+  const boardTasks = rows.map((t) => {
+    const cs = checks.filter((c) => c.taskId === t.id);
+    return {
+      id: t.id,
+      title: t.title,
+      status: t.status,
+      priority: t.priority,
+      priorityScore: t.priorityScore,
+      deadline: t.deadline,
+      checkTotal: cs.length,
+      checkDone: cs.filter((c) => c.done).length,
+    };
+  });
 
   return (
     <>
@@ -69,6 +94,23 @@ export default async function TaskBoardPage({
         }
       />
 
+      <div className="mb-4 flex flex-wrap gap-2">
+        {views.map((v) => (
+          <Link
+            key={v.key}
+            href={`/projects/${id}/tasks?view=${v.key}`}
+            className={
+              "rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors " +
+              (view === v.key
+                ? "bg-primary text-white"
+                : "bg-surface text-ink-secondary hover:bg-surface-muted")
+            }
+          >
+            {v.label}
+          </Link>
+        ))}
+      </div>
+
       {wip && (
         <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-warning-soft px-3 py-2 text-[13px] text-[#a9760f]">
           <AlertTriangle className="size-4 shrink-0" />
@@ -88,70 +130,30 @@ export default async function TaskBoardPage({
             </form>
           }
         />
+      ) : view === "timeline" ? (
+        <TaskTimeline
+          projectId={id}
+          projectDeadline={project.deadline}
+          tasks={rows.map((t) => ({
+            id: t.id,
+            title: t.title,
+            status: t.status,
+            priority: t.priority,
+            startDate: t.startDate,
+            deadline: t.deadline,
+          }))}
+          setDates={setTaskDates.bind(null, id)}
+        />
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {taskBoardColumns.map((col) => {
-            const ct = colTasks(col);
-            return (
-              <div key={col} className="w-[300px] shrink-0">
-                <div className="mb-2 flex items-center justify-between px-1">
-                  <span className="text-sm font-semibold text-ink">
-                    {taskStatus[col].label}
-                  </span>
-                  <span className="text-[13px] text-ink-muted">{ct.length}</span>
-                </div>
-                <div className="space-y-2 rounded-[16px] bg-surface-muted/60 p-2">
-                  {ct.length === 0 ? (
-                    <p className="px-2 py-6 text-center text-[12px] text-ink-muted">
-                      Kosong
-                    </p>
-                  ) : (
-                    ct.map((t) => {
-                      const c = checkOf(t.id);
-                      return (
-                        <div
-                          key={t.id}
-                          className="rounded-[12px] border border-[#ECECE8] bg-surface p-3 shadow-[0_1px_2px_rgba(24,24,27,0.04)]"
-                        >
-                          <div className="mb-1.5 flex items-center gap-1.5">
-                            <Badge tone={priorityLabels[t.priority].tone}>
-                              {priorityLabels[t.priority].label}
-                            </Badge>
-                            {t.priorityScore !== 0 && (
-                              <span className="text-[11px] text-ink-muted">
-                                skor {t.priorityScore}
-                              </span>
-                            )}
-                          </div>
-                          <Link
-                            href={`/projects/${id}/tasks/${t.id}`}
-                            className="line-clamp-2 text-sm font-medium text-ink hover:text-primary"
-                          >
-                            {t.title}
-                          </Link>
-                          <div className="mt-2 flex items-center gap-3 text-[12px] text-ink-muted">
-                            {t.deadline && <span>{formatDate(t.deadline)}</span>}
-                            {c.total > 0 && (
-                              <span>
-                                {c.done}/{c.total} checklist
-                              </span>
-                            )}
-                          </div>
-                          <div className="mt-2">
-                            <TaskMoveSelect
-                              current={t.status}
-                              action={moveTask.bind(null, id, t.id)}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <TaskBoard
+          projectId={id}
+          columns={taskBoardColumns}
+          tasks={boardTasks}
+          move={moveTaskBoard.bind(null, id)}
+          quickAdd={quickCreateTask.bind(null, id)}
+          rename={renameTask.bind(null, id)}
+          moveAction={moveTask.bind(null, id)}
+        />
       )}
     </>
   );

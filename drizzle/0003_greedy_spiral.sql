@@ -1,0 +1,1 @@
+ALTER TABLE "rabs" ADD COLUMN "show_price" boolean DEFAULT true NOT NULL;

@@ -117,42 +117,53 @@ a:active > .card-tap {
   }
 }
 
-/* A4 document sheet + print stylesheet (PRD §27). */
 .doc-sheet {
   width: 210mm;
   min-height: 297mm;
-  padding: 16mm 15mm;
+  padding: 15mm;
   box-shadow: var(--shadow-lg);
-  border-radius: 4px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  line-height: 1.5;
 }
 
-@page {
-  size: A4;
-  margin: 12mm;
-}
+.doc-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(190px, .62fr); gap: 28px; padding-bottom: 13px; border-bottom: 3px solid var(--document-accent); }
+.doc-title-block { min-width: 0; }
+.doc-title-block h1 { margin: 0; color: var(--color-ink); font-size: 25px; font-weight: 800; letter-spacing: .045em; line-height: 1; text-transform: uppercase; }
+.doc-number { margin-top: 7px; color: var(--document-accent); font-size: 11px; font-weight: 750; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.doc-status { display: inline-block; margin-top: 8px; border: 1px solid currentColor; border-radius: 2px; padding: 2px 6px; font-size: 8.5px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.doc-status-neutral { color: #59616d; }.doc-status-positive { color: #197248; }.doc-status-attention { color: #9a6200; }.doc-status-critical { color: #a52e2e; }
+.doc-meta { min-width: 0; margin: 0; font-size: 10px; }
+.doc-meta > div { display: grid; grid-template-columns: minmax(82px, auto) minmax(98px, 1fr); gap: 12px; padding: 1px 0; }
+.doc-meta dt { color: var(--color-ink-muted); }.doc-meta dd { margin: 0; font-weight: 650; overflow-wrap: anywhere; text-align: right; }
+.doc-parties { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px; margin-top: 19px; }
+.doc-party, .doc-recipient { min-width: 0; color: var(--color-ink-secondary); font-size: 10.5px; overflow-wrap: anywhere; }
+.doc-kicker { margin-bottom: 6px; color: var(--document-accent); font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.doc-brand { display: flex; min-width: 0; gap: 12px; align-items: flex-start; }
+.doc-logo { width: 88px; height: 88px; flex: none; object-fit: contain; object-position: left top; }
+.doc-business-name { max-width: 180px; color: var(--color-ink); font-size: 14px; font-weight: 750; line-height: 1.15; }
+.doc-contact { min-width: 0; color: var(--color-ink-secondary); font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+.doc-slogan { color: var(--color-ink); font-weight: 650; }
+.doc-recipient-name { color: var(--color-ink); font-size: 12px; font-weight: 750; }.doc-empty { color: var(--color-ink-muted); font-style: italic; }
+.doc-items { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 10px; }
+.doc-items th { padding: 7px 8px; border: 0; background: var(--document-accent); color: white; font-size: 8.8px; font-weight: 750; letter-spacing: .055em; text-align: left; text-transform: uppercase; }
+.doc-items td { padding: 7px 8px; border: 0; border-bottom: 1px solid var(--color-line); vertical-align: top; overflow-wrap: anywhere; }
+.doc-col-number { width: 28px; }.doc-col-quantity { width: 50px; text-align: right !important; }.doc-col-unit { width: 68px; }.doc-col-money { width: 105px; text-align: right !important; }
+.doc-section-row td { border-bottom-color: var(--color-line-strong); background: color-mix(in srgb, var(--document-accent) 8%, white); color: var(--color-ink); font-weight: 750; }
+.doc-item-name { font-weight: 650; }.doc-item-description { margin-top: 2px; color: var(--color-ink-muted); font-size: 9px; white-space: pre-line; }.doc-quantity, .doc-money { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }.doc-empty-row { color: var(--color-ink-muted); font-style: italic; text-align: center; }
+.doc-totals { display: flex; justify-content: flex-end; margin-top: 15px; break-inside: avoid; }.doc-totals dl { width: min(100%, 290px); margin: 0; }.doc-totals dl > div { display: flex; justify-content: space-between; gap: 18px; padding: 4px 0; }.doc-totals dt { color: var(--color-ink-secondary); }.doc-totals dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }.doc-total-strong { margin-top: 4px; border-top: 2px solid var(--color-ink); padding-top: 8px !important; color: var(--document-accent); font-size: 13px; font-weight: 800; }.doc-total-strong dt { color: var(--color-ink); }
+.doc-words { margin: 15px 0 0; padding: 8px 10px; border-left: 3px solid var(--document-accent); background: var(--color-surface-soft); font-size: 10px; font-style: italic; }.doc-words span { margin-right: 7px; color: var(--color-ink-muted); font-size: 9px; font-style: normal; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.doc-detail { margin-top: 16px; padding-top: 9px; border-top: 1px solid var(--color-line); break-inside: avoid; }.doc-detail h2 { margin: 0 0 4px; color: var(--color-ink); font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }.doc-detail p { margin: 0; color: var(--color-ink-secondary); }
+.doc-signature { width: 70mm; margin: 28px 0 0 auto; color: var(--color-ink-secondary); font-size: 10px; text-align: center; break-inside: avoid; }.doc-signature-media { position: relative; height: 100px; }.doc-signature-media img { position: absolute; left: 50%; object-fit: contain; transform: translateX(-50%); }.doc-stamp { top: 0; width: 55mm; height: 20mm; opacity: .8; }.doc-signature-image { top: -2mm; width: 70mm; height: 34mm; }.doc-signatory { border-top: 1px solid var(--color-line-strong); padding-top: 4px; color: var(--color-ink); font-weight: 650; }
+.doc-footer { margin-top: 20px; padding-top: 8px; border-top: 1px solid var(--color-line); color: var(--color-ink-muted); font-size: 9px; text-align: center; white-space: pre-line; }
 
+@page { size: A4; margin: 12mm; }
+@media (max-width: 760px) { .doc-sheet { margin: 0; transform-origin: top left; } }
 @media print {
-  body {
-    background: #ffffff;
-  }
-  .doc-sheet {
-    width: auto;
-    min-height: 0;
-    padding: 0;
-    box-shadow: none;
-    border-radius: 0;
-  }
-  /* Keep table headers on every page and never split a row. */
-  thead {
-    display: table-header-group;
-  }
-  tr,
-  img {
-    break-inside: avoid;
-  }
-  /* Force accent fills and tinted rows to actually ink. */
-  * {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
+  body { background: #fff; }
+  .doc-sheet { width: auto; min-height: 0; padding: 0; box-shadow: none; border-radius: 0; }
+  thead { display: table-header-group; }
+  tr, .doc-detail, .doc-signature, .doc-totals, img { break-inside: avoid; }
+  h1, h2 { break-after: avoid; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

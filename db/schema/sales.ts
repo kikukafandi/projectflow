@@ -1,4 +1,5 @@
 import {
+  boolean,
   date,
   integer,
   numeric,
@@ -24,6 +25,7 @@ export const rabs = pgTable("rabs", {
   // di-"finalkan". Postgres mengizinkan banyak NULL pada kolom unique.
   number: text("number").unique(),
   title: text("title"),
+  showPrice: boolean("show_price").default(true).notNull(),
   status: rabStatusEnum("status").default("draft").notNull(),
   currentVersion: integer("current_version").default(1).notNull(),
   discount: numeric("discount", { precision: 14, scale: 2 }).default("0"),
@@ -89,6 +91,7 @@ export const quotations = pgTable("quotations", {
   rabId: uuid("rab_id").references(() => rabs.id, { onDelete: "set null" }),
   number: text("number").notNull().unique(),
   status: quotationStatusEnum("status").default("draft").notNull(),
+  showPrice: boolean("show_price").default(true).notNull(),
   currentVersion: integer("current_version").default(1).notNull(),
   validUntil: date("valid_until"),
   subtotal: numeric("subtotal", { precision: 14, scale: 2 }).default("0"),

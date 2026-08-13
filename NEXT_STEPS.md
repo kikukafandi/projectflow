@@ -48,6 +48,13 @@ Konvensi yang SUDAH ada, ikuti persis (jangan bikin pola baru):
 9. ✅ Priority Score (`lib/priority.ts`, §21.3 + level), WIP Limit (§22, default 2, override + alasan → activity log), Daily Focus global (§23, max 3, rekomendasi by skor).
    - Sisa: task dependencies UI (tabel sudah ada), global task board lintas proyek — opsional.
 
+### ✅ Fase 8 — Board & Timeline interaktif (SELESAI)
+14. ✅ **Board drag & drop** (`components/task-board.tsx`) — seret kartu antar kolom & urut ulang di dalam kolom, garis sisip, optimistic via `useOptimistic`, quick-add per kolom, inline rename. Tanpa dependensi baru (HTML5 DnD). Sentuh tetap pakai `TaskMoveSelect`; keyboard pakai panah kiri/kanan pada kartu yang fokus.
+15. ✅ **Timeline/Gantt** (`components/task-timeline.tsx`) — `?view=timeline` di halaman task proyek. Bar per task dari `startDate`→`deadline`, seret untuk menggeser, tarik ujung untuk mengubah durasi (pointer events, jalan di sentuh), zoom 16–56px/hari, garis hari ini + deadline proyek, akhir pekan diarsir, daftar "belum dijadwalkan" dengan tombol jadwalkan.
+    - Action baru di `app/(app)/projects/[id]/tasks/actions.ts`: `moveTaskBoard`, `quickCreateTask`, `renameTask`, `setTaskDates`. Guard WIP limit + checklist wajib sekarang dipakai bersama oleh drag, dropdown, dan tombol Done (`blockedByChecklist`).
+    - Logika murni di `lib/planner.ts`, self-check: `npm run check:planner`.
+    - Sisa: timeline lintas proyek di `/tasks`, dependency antar bar, milestone di timeline — opsional.
+
 ### ✅ Fase 6 — Finance (SELESAI)
 10. ✅ Invoice dari quotation (full) & per-termin (partial, `invoices.paymentTermId`, term → status `invoiced`, dilepas lagi saat invoice dihapus), invoice manual, item CRUD, status otomatis dari pembayaran (`recomputeInvoice`: paid/partially_paid/overdue/sent).
 11. ✅ Payment tracking (confirm/cancel, sisa tagihan di ringkasan), Receipt/kuitansi 1:1 per payment + terbilang otomatis (`lib/terbilang.ts`), kuitansi void saat payment dibatalkan. Halaman `/payments` lintas invoice.
