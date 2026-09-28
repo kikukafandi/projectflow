@@ -1,6 +1,6 @@
 "use server";
 
-import { asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
@@ -15,13 +15,15 @@ import {
   rabs,
 } from "@/db/schema";
 import { logActivity } from "@/lib/activity";
-import { toNum } from "@/lib/money";
+import { lineSubtotal, toNum } from "@/lib/money";
 import { nextDocumentNumber } from "@/lib/numbering";
 import { requireUser } from "@/lib/session";
 import {
   paymentTermSchema,
+  quotationItemSchema,
   quotationMetaSchema,
   type PaymentTermInput,
+  type QuotationItemInput,
   type QuotationMetaInput,
 } from "@/lib/validations";
 
@@ -50,6 +52,7 @@ export async function generateQuotationFromRab(
       showPrice: rab.showPrice,
       subtotal: rab.subtotal ?? "0",
       grandTotal: rab.grandTotal ?? "0",
+      notes: "Estimasi awal. Nilai dan ruang lingkup dapat berubah setelah survei serta finalisasi kebutuhan.",
     })
     .returning({ id: quotations.id });
 
@@ -103,8 +106,8 @@ export async function updateQuotationMeta(
   await requireUser();
   const [q] = await db.select().from(quotations).where(eq(quotations.id, qid));
   if (!q) return { error: "Quotation tidak ditemukan" };
-  if (q.status === "approved")
-    return { error: "Quotation Approved tidak dapat diedit. Buat revisi." };
+  if (q.status !== "draft")
+    return { error: "Hanya Quotation Draft yang dapat diedit. Buat revisi." };
   const parsed = quotationMetaSchema.safeParse(values);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   await db
@@ -250,6 +253,132 @@ export async function deleteQuotation(
   await db.delete(quotations).where(eq(quotations.id, qid));
   revalidatePath(`/projects/${projectId}/quotations`);
   redirect(`/projects/${projectId}/quotations`);
+}
+
+async function editableQuotation(projectId: string, qid: string) {
+  const [quotation] = await db
+    .select()
+    .from(quotations)
+    .where(and(eq(quotations.id, qid), eq(quotations.projectId, projectId)));
+  return quotation?.status === "draft" ? quotation : null;
+}
+
+async function recomputeQuotation(qid: string) {
+  const sections = await db
+    .select({ id: quotationSections.id })
+    .from(quotationSections)
+    .where(eq(quotationSections.quotationId, qid));
+  const items = sections.length
+    ? await db
+        .select({ subtotal: quotationItems.subtotal })
+        .from(quotationItems)
+        .where(inArray(quotationItems.sectionId, sections.map((section) => section.id)))
+    : [];
+  const subtotal = items.reduce((sum, item) => sum + toNum(item.subtotal), 0);
+  await db
+    .update(quotations)
+    .set({ subtotal: String(subtotal), grandTotal: String(subtotal), updatedAt: new Date() })
+    .where(eq(quotations.id, qid));
+}
+
+export async function addQuotationSection(
+  projectId: string,
+  qid: string,
+  formData: FormData,
+): Promise<void> {
+  await requireUser();
+  if (!(await editableQuotation(projectId, qid))) return;
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return;
+  await db.insert(quotationSections).values({ quotationId: qid, name });
+  revalidatePath(`/projects/${projectId}/quotations/${qid}`);
+}
+
+export async function deleteQuotationSection(
+  projectId: string,
+  qid: string,
+  sectionId: string,
+): Promise<void> {
+  await requireUser();
+  if (!(await editableQuotation(projectId, qid))) return;
+  await db
+    .delete(quotationSections)
+    .where(and(eq(quotationSections.id, sectionId), eq(quotationSections.quotationId, qid)));
+  await recomputeQuotation(qid);
+  revalidatePath(`/projects/${projectId}/quotations/${qid}`);
+}
+
+export async function addQuotationItem(
+  projectId: string,
+  qid: string,
+  sectionId: string,
+  values: QuotationItemInput,
+): Promise<Result> {
+  await requireUser();
+  if (!(await editableQuotation(projectId, qid))) return { error: "Quotation tidak dapat diedit" };
+  const [section] = await db
+    .select({ id: quotationSections.id })
+    .from(quotationSections)
+    .where(and(eq(quotationSections.id, sectionId), eq(quotationSections.quotationId, qid)));
+  if (!section) return { error: "Section tidak ditemukan" };
+  const parsed = quotationItemSchema.safeParse(values);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  await db.insert(quotationItems).values({
+    sectionId,
+    ...parsed.data,
+    subtotal: String(lineSubtotal(parsed.data.quantity ?? "0", parsed.data.unitPrice ?? "0")),
+  });
+  await recomputeQuotation(qid);
+  revalidatePath(`/projects/${projectId}/quotations/${qid}`);
+  redirect(`/projects/${projectId}/quotations/${qid}`);
+}
+
+export async function updateQuotationItem(
+  projectId: string,
+  qid: string,
+  itemId: string,
+  values: QuotationItemInput,
+): Promise<Result> {
+  await requireUser();
+  if (!(await editableQuotation(projectId, qid))) return { error: "Quotation tidak dapat diedit" };
+  const sectionIds = await db
+    .select({ id: quotationSections.id })
+    .from(quotationSections)
+    .where(eq(quotationSections.quotationId, qid));
+  const parsed = quotationItemSchema.safeParse(values);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!sectionIds.length) return { error: "Item tidak ditemukan" };
+  await db
+    .update(quotationItems)
+    .set({
+      ...parsed.data,
+      subtotal: String(lineSubtotal(parsed.data.quantity ?? "0", parsed.data.unitPrice ?? "0")),
+      updatedAt: new Date(),
+    })
+    .where(and(eq(quotationItems.id, itemId), inArray(quotationItems.sectionId, sectionIds.map((section) => section.id))));
+  await recomputeQuotation(qid);
+  revalidatePath(`/projects/${projectId}/quotations/${qid}`);
+  redirect(`/projects/${projectId}/quotations/${qid}`);
+}
+
+export async function deleteQuotationItem(
+  projectId: string,
+  qid: string,
+  itemId: string,
+): Promise<void> {
+  await requireUser();
+  if (!(await editableQuotation(projectId, qid))) return;
+  const sectionIds = await db
+    .select({ id: quotationSections.id })
+    .from(quotationSections)
+    .where(eq(quotationSections.quotationId, qid));
+  if (sectionIds.length) {
+    await db
+      .delete(quotationItems)
+      .where(and(eq(quotationItems.id, itemId), inArray(quotationItems.sectionId, sectionIds.map((section) => section.id))));
+  }
+  await recomputeQuotation(qid);
+  revalidatePath(`/projects/${projectId}/quotations/${qid}`);
 }
 
 // ---- Payment terms ----

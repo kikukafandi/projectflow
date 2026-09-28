@@ -295,6 +295,12 @@ export const rabItemSchema = z.object({
 });
 export type RabItemInput = z.input<typeof rabItemSchema>;
 
+export const quotationItemSchema = rabItemSchema.omit({
+  estimateHours: true,
+  notes: true,
+});
+export type QuotationItemInput = z.input<typeof quotationItemSchema>;
+
 export const quotationMetaSchema = z.object({
   showPrice: z.boolean().default(true),
   validUntil: optionalStr,

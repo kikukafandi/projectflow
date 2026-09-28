@@ -24,14 +24,17 @@ import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmSubmit } from "@/components/confirm-submit";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select } from "@/components/ui/input";
+import { Input, Select } from "@/components/ui/input";
 import { QuotationMetaForm } from "@/components/forms/quotation-meta-form";
 import { paymentTermTypeLabels, quotationStatus } from "@/lib/labels";
 import { toNum } from "@/lib/money";
 import { formatDate, formatIDR } from "@/lib/utils";
 import {
+  addQuotationSection,
   deletePaymentTerm,
   deleteQuotation,
+  deleteQuotationItem,
+  deleteQuotationSection,
   reviseQuotation,
   setQuotationStatus,
   updateQuotationMeta,
@@ -93,6 +96,7 @@ export default async function QuotationEditorPage({
     invoiceRows.find((i) => i.paymentTermId === termId);
 
   const approved = q.status === "approved";
+  const editable = q.status === "draft";
   const grand = toNum(q.grandTotal);
   const termsTotal = terms.reduce((s, t) => s + toNum(t.amount), 0);
   const termsPercent = terms.reduce((s, t) => s + toNum(t.percent), 0);
@@ -172,7 +176,23 @@ export default async function QuotationEditorPage({
           {sections.map((s) => (
             <Card key={s.id}>
               <CardContent>
-                <div className="mb-2 font-medium text-ink">{s.name}</div>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <div className="font-medium text-ink">{s.name}</div>
+                  {editable && (
+                    <div className="flex items-center gap-1">
+                      <Button asChild variant="ghost" size="sm">
+                        <Link href={`/projects/${id}/quotations/${qid}/items/new?section=${s.id}`}>
+                          <Plus /> Item
+                        </Link>
+                      </Button>
+                      <form action={deleteQuotationSection.bind(null, id, qid, s.id)}>
+                        <Button type="submit" variant="ghost" size="icon" aria-label="Hapus section" className="text-danger hover:bg-danger-soft">
+                          <Trash2 />
+                        </Button>
+                      </form>
+                    </div>
+                  )}
+                </div>
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[480px] text-left text-sm">
                     <thead className="text-[12px] text-ink-muted">
@@ -181,6 +201,7 @@ export default async function QuotationEditorPage({
                         <th className="py-1.5 text-right font-medium">Qty</th>
                         <th className="py-1.5 text-right font-medium">Harga</th>
                         <th className="py-1.5 text-right font-medium">Subtotal</th>
+                        {editable && <th className="py-1.5" />}
                       </tr>
                     </thead>
                     <tbody>
@@ -190,6 +211,16 @@ export default async function QuotationEditorPage({
                           <td className="tabular py-2 text-right">{Number(it.quantity)}</td>
                           <td className="tabular py-2 text-right">{formatIDR(it.unitPrice)}</td>
                           <td className="tabular py-2 text-right">{formatIDR(it.subtotal)}</td>
+                          {editable && (
+                            <td className="py-2 text-right">
+                              <div className="flex justify-end gap-2 text-[13px]">
+                                <Link href={`/projects/${id}/quotations/${qid}/items/${it.id}/edit`} className="text-primary hover:underline">Edit</Link>
+                                <form action={deleteQuotationItem.bind(null, id, qid, it.id)}>
+                                  <button type="submit" className="text-danger hover:underline">Hapus</button>
+                                </form>
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       ))}
                       {itemsOf(s.id).length > 0 && (
@@ -198,6 +229,7 @@ export default async function QuotationEditorPage({
                           <td className="tabular py-2 text-right">
                             {formatIDR(itemsOf(s.id).reduce((sum, it) => sum + toNum(it.subtotal), 0))}
                           </td>
+                          {editable && <td />}
                         </tr>
                       )}
                     </tbody>
@@ -206,6 +238,15 @@ export default async function QuotationEditorPage({
               </CardContent>
             </Card>
           ))}
+
+          {editable && (
+            <form action={addQuotationSection.bind(null, id, qid)} className="flex gap-2">
+              <Input name="name" placeholder="Nama section baru…" required />
+              <Button type="submit" variant="secondary">
+                <Plus /> Section
+              </Button>
+            </form>
+          )}
 
           {/* Payment terms (PRD §19) */}
           <Card>
@@ -311,7 +352,7 @@ export default async function QuotationEditorPage({
               <h3 className="mb-3 text-sm font-semibold text-ink">Detail Penawaran</h3>
               <QuotationMetaForm
                 action={updateQuotationMeta.bind(null, id, qid)}
-                disabled={approved}
+                disabled={!editable}
                 defaultValues={{
                   showPrice: q.showPrice,
                   validUntil: q.validUntil ?? undefined,

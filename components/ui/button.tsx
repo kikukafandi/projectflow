@@ -1,7 +1,10 @@
+"use client";
+
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
 import * as React from "react";
+import { useFormStatus } from "react-dom";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -38,13 +41,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     { className, variant, size, asChild = false, loading = false, disabled, children, ...props },
     ref,
   ) => {
+    const { pending } = useFormStatus();
+    const isLoading = loading || (!asChild && props.type !== "button" && pending);
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
         ref={ref}
         className={cn(buttonVariants({ variant, size }), className)}
-        disabled={disabled || loading}
-        aria-busy={loading || undefined}
+        disabled={disabled || isLoading}
+        aria-busy={isLoading || undefined}
         {...props}
       >
         {/* asChild membungkus satu elemen (mis. <Link>) — Slot menolak anak ganda,
@@ -53,7 +58,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           children
         ) : (
           <>
-            {loading ? <Loader2 className="animate-spin" aria-hidden /> : null}
+            {isLoading ? <Loader2 className="animate-spin" aria-hidden /> : null}
             {children}
           </>
         )}
