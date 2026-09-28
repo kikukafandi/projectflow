@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { rabStatus } from "@/lib/labels";
+import { toNum } from "@/lib/money";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { generateRabFromScope } from "./actions";
 
@@ -72,6 +73,12 @@ export default async function RabListPage({
         />
       ) : (
         <div className="space-y-3">
+          <div className="flex justify-end gap-2 text-sm">
+            <span className="text-ink-muted">Subtotal</span>
+            <span className="tabular font-semibold text-ink">
+              {formatIDR(rows.reduce((sum, r) => sum + toNum(r.grandTotal), 0))}
+            </span>
+          </div>
           {rows.map((r) => (
             <Link key={r.id} href={`/projects/${id}/rab/${r.id}`}>
               <Card className="transition-shadow hover:shadow-[0_4px_14px_rgba(24,24,27,0.06)]">

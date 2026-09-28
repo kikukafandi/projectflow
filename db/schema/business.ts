@@ -21,6 +21,7 @@ export const businessProfiles = pgTable("business_profiles", {
   whatsapp: text("whatsapp"),
   website: text("website"),
   npwp: text("npwp"),
+  nib: text("nib"),
   slogan: text("slogan"),
   // Document identity
   primaryColor: text("primary_color").default("#FF7A1A"),

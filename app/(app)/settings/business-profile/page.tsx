@@ -25,6 +25,7 @@ export default async function BusinessProfilePage() {
         whatsapp: profile.whatsapp ?? undefined,
         website: profile.website ?? undefined,
         npwp: profile.npwp ?? undefined,
+        nib: profile.nib ?? undefined,
         slogan: profile.slogan ?? undefined,
         primaryColor: profile.primaryColor ?? undefined,
         logoUrl: profile.logoUrl ?? undefined,

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select } from "@/components/ui/input";
 import { quotationStatus } from "@/lib/labels";
+import { toNum } from "@/lib/money";
 import { formatDate, formatIDR } from "@/lib/utils";
 import { generateQuotationFromRab } from "./actions";
 
@@ -89,6 +90,12 @@ export default async function QuotationListPage({
         />
       ) : (
         <div className="space-y-3">
+          <div className="flex justify-end gap-2 text-sm">
+            <span className="text-ink-muted">Subtotal</span>
+            <span className="tabular font-semibold text-ink">
+              {formatIDR(rows.reduce((sum, q) => sum + toNum(q.grandTotal), 0))}
+            </span>
+          </div>
           {rows.map((q) => (
             <Link key={q.id} href={`/projects/${id}/quotations/${q.id}`}>
               <Card className="transition-shadow hover:shadow-[0_4px_14px_rgba(24,24,27,0.06)]">

@@ -16,6 +16,7 @@ import {
   projectModules,
   projects,
 } from "@/db/schema";
+import { AddLibraryModuleButton } from "@/components/add-library-module-button";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Badge, StatusBadge } from "@/components/ui/badge";
@@ -63,6 +64,8 @@ export default async function ScopePage({
 
   const featsOf = (moduleId: string) =>
     feats.filter((f) => f.projectModuleId === moduleId);
+  const addedSourceIds = new Set(mods.map((mod) => mod.sourceModuleId));
+  const availableLibMods = libMods.filter((mod) => !addedSourceIds.has(mod.id));
 
   const counted = feats.filter(
     (f) => f.status === "included" || f.status === "approved",
@@ -217,20 +220,18 @@ export default async function ScopePage({
                   </Link>
                   .
                 </p>
+              ) : availableLibMods.length === 0 ? (
+                <p className="text-[13px] text-ink-muted">
+                  Semua modul library sudah ditambahkan.
+                </p>
               ) : (
                 <div className="space-y-1">
-                  {libMods.map((lm) => (
+                  {availableLibMods.map((lm) => (
                     <form
                       key={lm.id}
                       action={addModuleFromLibrary.bind(null, id, lm.id)}
                     >
-                      <button
-                        type="submit"
-                        className="flex w-full items-center justify-between rounded-[10px] px-2.5 py-2 text-left text-sm hover:bg-surface-muted"
-                      >
-                        {lm.name}
-                        <Plus className="size-4 text-primary" />
-                      </button>
+                      <AddLibraryModuleButton name={lm.name} />
                     </form>
                   ))}
                 </div>
@@ -239,7 +240,7 @@ export default async function ScopePage({
                 action={addManualModule.bind(null, id)}
                 className="mt-3 flex gap-2"
               >
-                <Input name="name" placeholder="Modul manual…" className="h-9" />
+                <Input name="name" placeholder="Modul manual…" className="h-9" required />
                 <Button type="submit" variant="secondary" size="sm">
                   Add
                 </Button>

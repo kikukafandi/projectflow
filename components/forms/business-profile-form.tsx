@@ -88,6 +88,9 @@ export function BusinessProfileForm({
           <Field label="NPWP" htmlFor="npwp">
             <Input id="npwp" {...register("npwp")} />
           </Field>
+          <Field label="NIB" htmlFor="nib">
+            <Input id="nib" {...register("nib")} />
+          </Field>
         </CardContent>
       </Card>
 

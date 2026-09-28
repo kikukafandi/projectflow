@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/ui/badge";
 import { Table, TD, TH, THead, TR } from "@/components/ui/table";
 import { quotationStatus, rabStatus } from "@/lib/labels";
+import { toNum } from "@/lib/money";
 import { formatDate, formatIDR } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -101,6 +102,13 @@ export default async function SalesPage() {
                       </TD>
                     </TR>
                   ))}
+                  <TR className="bg-surface-soft font-semibold">
+                    <TD colSpan={4}>Subtotal</TD>
+                    <TD className="tabular text-right">
+                      {formatIDR(rabRows.reduce((sum, r) => sum + toNum(r.grandTotal), 0))}
+                    </TD>
+                    <TD />
+                  </TR>
                 </tbody>
               </Table>
             )}
@@ -144,6 +152,13 @@ export default async function SalesPage() {
                       </TD>
                     </TR>
                   ))}
+                  <TR className="bg-surface-soft font-semibold">
+                    <TD colSpan={4}>Subtotal</TD>
+                    <TD className="tabular text-right">
+                      {formatIDR(quotationRows.reduce((sum, q) => sum + toNum(q.grandTotal), 0))}
+                    </TD>
+                    <TD />
+                  </TR>
                 </tbody>
               </Table>
             )}

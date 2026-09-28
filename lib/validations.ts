@@ -177,6 +177,7 @@ export const businessProfileSchema = z.object({
   whatsapp: optionalStr,
   website: optionalStr,
   npwp: optionalStr,
+  nib: optionalStr,
   slogan: optionalStr,
   primaryColor: optionalStr,
   // Document identity images (PRD §27.3). URLs — hosting is out of scope for now.

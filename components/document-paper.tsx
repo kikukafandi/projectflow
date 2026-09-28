@@ -63,6 +63,7 @@ export function DocumentPaper({
               {profile?.slogan && <div className="doc-slogan">{profile.slogan}</div>}
               {address.map((line) => <div key={line}>{line}</div>)}
               {contacts.map((contact) => <div key={contact}>{contact}</div>)}
+              {profile?.nib && <div>NIB {profile.nib}</div>}
               {profile?.showNpwpInDocumentHeader && profile.npwp && <div>NPWP {profile.npwp}</div>}
             </div>
           </div>

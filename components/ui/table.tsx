@@ -46,12 +46,10 @@ export function TR({
 export function TD({
   children,
   className,
-}: {
-  children?: React.ReactNode;
-  className?: string;
-}) {
+  ...props
+}: React.ComponentProps<"td">) {
   return (
-    <td className={cn("px-4 py-3.5 align-middle text-ink", className)}>
+    <td className={cn("px-4 py-3.5 align-middle text-ink", className)} {...props}>
       {children}
     </td>
   );
