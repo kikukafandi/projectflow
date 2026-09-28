@@ -298,7 +298,13 @@ export async function loadDocument(
           { label: "Proyek", value: project?.name ?? "—" },
         ],
         recipient: clientBlock(client),
-        sections: [{ name: "", items }],
+        sections: items.reduce<DocSection[]>((sections, item) => {
+          const name = item.sectionName ?? "Item";
+          const section = sections.find((entry) => entry.name === name);
+          if (section) section.items.push(item);
+          else sections.push({ name, items: [item] });
+          return sections;
+        }, []),
         totals,
         amountInWords: terbilangRupiah(inv.total ?? "0"),
         notes: inv.notes,

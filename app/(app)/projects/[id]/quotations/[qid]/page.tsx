@@ -192,6 +192,14 @@ export default async function QuotationEditorPage({
                           <td className="tabular py-2 text-right">{formatIDR(it.subtotal)}</td>
                         </tr>
                       ))}
+                      {itemsOf(s.id).length > 0 && (
+                        <tr className="border-t border-line font-semibold">
+                          <td colSpan={3} className="py-2 text-right">Subtotal section</td>
+                          <td className="tabular py-2 text-right">
+                            {formatIDR(itemsOf(s.id).reduce((sum, it) => sum + toNum(it.subtotal), 0))}
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>

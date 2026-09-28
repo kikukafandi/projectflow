@@ -63,12 +63,6 @@ export default async function ProjectInvoicesPage({
         />
       ) : (
         <div className="space-y-3">
-          <div className="flex justify-end gap-2 text-sm">
-            <span className="text-ink-muted">Subtotal</span>
-            <span className="tabular font-semibold text-ink">
-              {formatIDR(rows.reduce((sum, i) => sum + toNum(i.total), 0))}
-            </span>
-          </div>
           {rows.map((i) => (
             <Link key={i.id} href={`/invoices/${i.id}`}>
               <Card className="transition-shadow hover:shadow-[0_4px_14px_rgba(24,24,27,0.06)]">

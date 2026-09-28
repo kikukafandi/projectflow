@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
 import { db } from "@/db";
 import {
   businessBankAccounts,
@@ -75,6 +76,16 @@ export default async function InvoiceDetailPage({
     receiptRows.find((r) => r.paymentId === paymentId);
 
   const remaining = toNum(inv.total) - toNum(inv.paidAmount);
+  const itemSections = items.reduce<Array<{ name: string; items: typeof items }>>(
+    (sections, item) => {
+      const name = item.sectionName ?? "Item";
+      const section = sections.find((entry) => entry.name === name);
+      if (section) section.items.push(item);
+      else sections.push({ name, items: [item] });
+      return sections;
+    },
+    [],
+  );
   const bankOptions = banks.map((b) => ({
     id: b.id,
     label: `${b.bankName} · ${b.accountNumber}`,
@@ -154,20 +165,34 @@ export default async function InvoiceDetailPage({
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map((it) => (
-                        <tr key={it.id} className="border-t border-line">
-                          <td className="py-2">{it.name}</td>
-                          <td className="tabular py-2 text-right">{Number(it.quantity)}</td>
-                          <td className="tabular py-2 text-right">{formatIDR(it.unitPrice)}</td>
-                          <td className="tabular py-2 text-right">{formatIDR(it.subtotal)}</td>
-                          <td className="py-2 text-right">
-                            <form action={deleteInvoiceItem.bind(null, invoiceId, it.id)}>
-                              <button type="submit" aria-label="Hapus item" className="text-danger hover:underline text-[13px]">
-                                Hapus
-                              </button>
-                            </form>
-                          </td>
-                        </tr>
+                      {itemSections.map((section) => (
+                        <Fragment key={section.name}>
+                          <tr className="border-t border-line bg-surface-soft font-medium">
+                            <td colSpan={5} className="py-2">{section.name}</td>
+                          </tr>
+                          {section.items.map((it) => (
+                            <tr key={it.id} className="border-t border-line">
+                              <td className="py-2">{it.name}</td>
+                              <td className="tabular py-2 text-right">{Number(it.quantity)}</td>
+                              <td className="tabular py-2 text-right">{formatIDR(it.unitPrice)}</td>
+                              <td className="tabular py-2 text-right">{formatIDR(it.subtotal)}</td>
+                              <td className="py-2 text-right">
+                                <form action={deleteInvoiceItem.bind(null, invoiceId, it.id)}>
+                                  <button type="submit" aria-label="Hapus item" className="text-danger hover:underline text-[13px]">
+                                    Hapus
+                                  </button>
+                                </form>
+                              </td>
+                            </tr>
+                          ))}
+                          <tr className="border-t border-line font-semibold">
+                            <td colSpan={3} className="py-2 text-right">Subtotal section</td>
+                            <td className="tabular py-2 text-right">
+                              {formatIDR(section.items.reduce((sum, it) => sum + toNum(it.subtotal), 0))}
+                            </td>
+                            <td />
+                          </tr>
+                        </Fragment>
                       ))}
                     </tbody>
                   </table>

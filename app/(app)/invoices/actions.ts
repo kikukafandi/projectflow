@@ -123,6 +123,7 @@ export async function createInvoiceFromQuotation(
         its.map((it) => ({
           invoiceId: inv.id,
           name: it.name,
+          sectionName: s.name,
           description: it.description,
           quantity: it.quantity,
           unit: it.unit,

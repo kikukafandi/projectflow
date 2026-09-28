@@ -148,55 +148,67 @@ export default async function ScopePage({
                         Belum ada fitur pada modul ini.
                       </p>
                     ) : (
-                      <ul className="divide-y divide-line">
-                        {mf.map((f) => (
-                          <li
-                            key={f.id}
-                            className="flex flex-wrap items-center justify-between gap-2 py-2.5"
-                          >
-                            <div className="min-w-0">
+                      <>
+                        <ul className="divide-y divide-line">
+                          {mf.map((f) => (
+                            <li
+                              key={f.id}
+                              className="flex flex-wrap items-center justify-between gap-2 py-2.5"
+                            >
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-ink">{f.name}</span>
+                                  <StatusBadge map={scopeStatus} value={f.status} />
+                                </div>
+                                <div className="tabular text-[12px] text-ink-muted">
+                                  {toNum(f.quantity)} {f.unit ?? ""} ×{" "}
+                                  {formatIDR(f.unitPrice)}
+                                </div>
+                              </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-sm text-ink">{f.name}</span>
-                                <StatusBadge map={scopeStatus} value={f.status} />
-                              </div>
-                              <div className="tabular text-[12px] text-ink-muted">
-                                {toNum(f.quantity)} {f.unit ?? ""} ×{" "}
-                                {formatIDR(f.unitPrice)}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="tabular text-sm text-ink">
-                                {formatIDR(lineSubtotal(f.quantity, f.unitPrice))}
-                              </span>
-                              <Button
-                                asChild
-                                variant="ghost"
-                                size="icon"
-                                aria-label="Edit fitur"
-                              >
-                                <Link
-                                  href={`/projects/${id}/scope/feature/${f.id}/edit`}
-                                >
-                                  <Pencil className="size-4" />
-                                </Link>
-                              </Button>
-                              <form
-                                action={deleteScopeFeature.bind(null, id, f.id)}
-                              >
+                                <span className="tabular text-sm text-ink">
+                                  {formatIDR(lineSubtotal(f.quantity, f.unitPrice))}
+                                </span>
                                 <Button
-                                  type="submit"
+                                  asChild
                                   variant="ghost"
                                   size="icon"
-                                  aria-label="Hapus fitur"
-                                  className="text-danger hover:bg-danger-soft"
+                                  aria-label="Edit fitur"
                                 >
-                                  <Trash2 className="size-4" />
+                                  <Link
+                                    href={`/projects/${id}/scope/feature/${f.id}/edit`}
+                                  >
+                                    <Pencil className="size-4" />
+                                  </Link>
                                 </Button>
-                              </form>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
+                                <form
+                                  action={deleteScopeFeature.bind(null, id, f.id)}
+                                >
+                                  <Button
+                                    type="submit"
+                                    variant="ghost"
+                                    size="icon"
+                                    aria-label="Hapus fitur"
+                                    className="text-danger hover:bg-danger-soft"
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </Button>
+                                </form>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="flex justify-end gap-3 border-t border-line pt-3 text-sm font-semibold">
+                          <span>Subtotal section</span>
+                          <span className="tabular">
+                            {formatIDR(
+                              mf
+                                .filter((f) => f.status === "included" || f.status === "approved")
+                                .reduce((sum, f) => sum + lineSubtotal(f.quantity, f.unitPrice), 0),
+                            )}
+                          </span>
+                        </div>
+                      </>
                     )}
                   </CardContent>
                 </Card>

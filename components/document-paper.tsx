@@ -120,5 +120,9 @@ function SectionRows({ section, hasUnitColumn, showPrice, showHeading }: { secti
       {hasUnitColumn && <><td className="doc-quantity">{Number(item.quantity ?? 1)}</td><td>{item.unit || ""}</td></>}
       {showPrice && <><td className="doc-money">{formatIDR(item.unitPrice)}</td><td className="doc-money">{formatIDR(item.subtotal)}</td></>}
     </tr>)}
+    {showPrice && section.items.length > 0 && <tr className="doc-section-subtotal">
+      <td colSpan={span - 1}>Subtotal section</td>
+      <td className="doc-money">{formatIDR(section.items.reduce((sum, item) => sum + toNum(item.subtotal), 0))}</td>
+    </tr>}
   </>;
 }

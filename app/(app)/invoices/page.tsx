@@ -80,12 +80,6 @@ export default async function InvoicesPage() {
         />
       ) : (
         <>
-          <div className="mb-3 flex justify-end gap-2 text-sm">
-            <span className="text-ink-muted">Subtotal</span>
-            <span className="tabular font-semibold text-ink">
-              {formatIDR(rows.reduce((sum, i) => sum + toNum(i.total), 0))}
-            </span>
-          </div>
           <div className="hidden md:block">
             <Table>
               <THead>

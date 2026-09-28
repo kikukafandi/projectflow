@@ -17,7 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TD, TH, THead, TR } from "@/components/ui/table";
 import type { DocType } from "@/lib/documents";
 import type { Tone } from "@/lib/labels";
-import { toNum } from "@/lib/money";
 import { formatDate, formatIDR } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -194,13 +193,6 @@ export default async function DocumentsPage() {
                 </TD>
               </TR>
             ))}
-            <TR className="bg-surface-soft font-semibold">
-              <TD colSpan={4}>Subtotal</TD>
-              <TD className="tabular text-right">
-                {formatIDR(rows.reduce((sum, row) => sum + toNum(row.amount), 0))}
-              </TD>
-              <TD />
-            </TR>
           </tbody>
         </Table>
       )}
