@@ -94,7 +94,7 @@ export function DocumentPaper({
         {doc.paidStamp.map((p, i) => <div key={i}>{p.label} · {p.date} · {p.amount}</div>)}
       </section>}
       {doc.amountInWords && <p className="doc-words"><span>Terbilang</span>{doc.amountInWords}</p>}
-      {doc.bank && <DocumentSection title="Informasi Pembayaran"><p>{doc.bank.bankName} · {doc.bank.accountNumber} · a.n. {doc.bank.accountHolder}</p></DocumentSection>}
+      {doc.bank && <DocumentSection title="Informasi Pembayaran"><p>{doc.bank.bankName} · {doc.bank.accountNumber} · a.n. {doc.bank.accountHolder}</p>{doc.bank.qrisUrl && <img src={doc.bank.qrisUrl} alt="QRIS" className="doc-qris" />}</DocumentSection>}
       {doc.terms && <DocumentSection title="Syarat & Ketentuan"><p className="whitespace-pre-line">{doc.terms}</p></DocumentSection>}
       {(doc.notes || profile?.defaultNote) && <DocumentSection title="Catatan"><p className="whitespace-pre-line">{doc.notes || profile?.defaultNote}</p></DocumentSection>}
 

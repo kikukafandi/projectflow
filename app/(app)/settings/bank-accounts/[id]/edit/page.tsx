@@ -26,6 +26,7 @@ export default async function EditBankAccountPage({
     accountNumber: row.accountNumber,
     accountHolder: row.accountHolder,
     branch: row.branch ?? undefined,
+    qrisUrl: row.qrisUrl ?? undefined,
     isPrimary: row.isPrimary,
   };
 

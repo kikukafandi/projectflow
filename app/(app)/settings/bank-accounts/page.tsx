@@ -61,6 +61,7 @@ export default async function BankAccountsPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-ink">{b.bankName}</span>
                     {b.isPrimary && <Badge tone="green">Utama</Badge>}
+                    {b.qrisUrl && <Badge>QRIS</Badge>}
                   </div>
                   <div className="tabular text-sm text-ink-secondary">
                     {b.accountNumber} · {b.accountHolder}

@@ -197,6 +197,7 @@ export const bankAccountSchema = z.object({
   accountNumber: z.string().trim().min(1, "Nomor rekening wajib diisi"),
   accountHolder: z.string().trim().min(1, "Nama pemilik rekening wajib diisi"),
   branch: optionalStr,
+  qrisUrl: optionalStr,
   isPrimary: z.coerce.boolean().default(false),
 });
 export type BankAccountInput = z.input<typeof bankAccountSchema>;

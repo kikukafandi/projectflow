@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const sections = [
   { icon: Building2, label: "Business Profile", desc: "Identitas bisnis untuk dokumen.", href: "/settings/business-profile" },
-  { icon: CreditCard, label: "Bank Accounts", desc: "Rekening penerimaan pembayaran.", href: "/settings/bank-accounts" },
+  { icon: CreditCard, label: "Bank & QRIS", desc: "Rekening & QRIS penerimaan pembayaran.", href: "/settings/bank-accounts" },
   { icon: Tag, label: "Pricing & Productivity", desc: "Tarif, pajak, diskon & WIP limit.", href: "/settings/general" },
   { icon: FileDigit, label: "Numbering", desc: "Format nomor dokumen.", href: "/settings/numbering" },
   { icon: User, label: "Account", desc: "Akun & keamanan.", href: "/settings/account" },

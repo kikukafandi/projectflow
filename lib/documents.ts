@@ -65,7 +65,7 @@ export type DocData = {
   amountInWords?: string | null;
   notes?: string | null;
   terms?: string | null;
-  bank?: { bankName: string; accountNumber: string; accountHolder: string } | null;
+  bank?: { bankName: string; accountNumber: string; accountHolder: string; qrisUrl?: string | null } | null;
   /** "Sudah dibayar" stamp — e.g. DP received before the quotation was revised. */
   paidStamp?: { label: string; date: string; amount: string }[];
   /** Signature block caption, e.g. "Diterima oleh" on a receipt. */
@@ -90,6 +90,7 @@ function bankOf(b: typeof businessBankAccounts.$inferSelect | null | undefined) 
         bankName: b.bankName,
         accountNumber: b.accountNumber,
         accountHolder: b.accountHolder,
+        qrisUrl: b.qrisUrl,
       }
     : null;
 }

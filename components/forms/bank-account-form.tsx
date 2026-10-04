@@ -52,6 +52,11 @@ export function BankAccountForm({
           <Field label="Cabang" htmlFor="branch">
             <Input id="branch" {...register("branch")} />
           </Field>
+          <div className="sm:col-span-2">
+            <Field label="URL Gambar QRIS" htmlFor="qrisUrl" hint="Link gambar QR (PNG/JPG). Tampil di invoice & quotation.">
+              <Input id="qrisUrl" placeholder="https://…" {...register("qrisUrl")} />
+            </Field>
+          </div>
           <label className="flex items-center gap-2 sm:col-span-2">
             <input
               type="checkbox"
