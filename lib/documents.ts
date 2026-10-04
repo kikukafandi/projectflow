@@ -3,7 +3,7 @@
  * A4 template renders RAB, Quotation, Invoice, and Kuitansi.
  * Values are read straight from the stored rows — the paper must equal the DB.
  */
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import {
   businessBankAccounts,
@@ -11,6 +11,7 @@ import {
   clients,
   invoiceItems,
   invoices,
+  paymentTerms,
   payments,
   projects,
   quotationItems,
@@ -65,6 +66,8 @@ export type DocData = {
   notes?: string | null;
   terms?: string | null;
   bank?: { bankName: string; accountNumber: string; accountHolder: string } | null;
+  /** "Sudah dibayar" stamp — e.g. DP received before the quotation was revised. */
+  paidStamp?: { label: string; date: string; amount: string }[];
   /** Signature block caption, e.g. "Diterima oleh" on a receipt. */
   signedLabel: string;
 };
@@ -118,6 +121,32 @@ function clientBlock(c: typeof clients.$inferSelect | undefined) {
       c.email ?? "",
     ].filter(Boolean),
   };
+}
+
+/**
+ * Confirmed payments on any invoice of the project, oldest first. Project-level
+ * on purpose: a DP paid against quotation v1 still counts after revision to v2.
+ */
+// ponytail: counts every project invoice; scope by quotation lineage if a project ever holds unrelated quotations.
+export async function projectPayments(projectId: string) {
+  const rows = await db
+    .select({
+      amount: payments.amount,
+      paidAt: payments.paidAt,
+      termName: paymentTerms.name,
+      invoiceNumber: invoices.number,
+    })
+    .from(payments)
+    .innerJoin(invoices, eq(payments.invoiceId, invoices.id))
+    .leftJoin(paymentTerms, eq(invoices.paymentTermId, paymentTerms.id))
+    .where(and(eq(invoices.projectId, projectId), eq(payments.status, "confirmed")))
+    .orderBy(asc(payments.paidAt));
+  return rows.map((r) => ({
+    label: r.termName ?? `Pembayaran ${r.invoiceNumber}`,
+    date: formatDate(r.paidAt),
+    amount: formatIDR(r.amount),
+    value: toNum(r.amount),
+  }));
 }
 
 /** Returns null when the document does not exist (caller renders notFound). */
@@ -216,6 +245,20 @@ export async function loadDocument(
         .orderBy(asc(quotationItems.position));
       docSections.push({ name: s.name, items: its });
     }
+    const paid = await projectPayments(q.projectId);
+    const paidTotal = paid.reduce((sum, p) => sum + p.value, 0);
+    const totals: DocTotal[] = [
+      { label: "Subtotal", value: formatIDR(q.subtotal) },
+      { label: "Grand Total", value: formatIDR(q.grandTotal), strong: true },
+    ];
+    if (paidTotal > 0) {
+      totals.push({ label: "Sudah dibayar", value: `−${formatIDR(paidTotal)}` });
+      totals.push({
+        label: "Sisa tagihan",
+        value: formatIDR(toNum(q.grandTotal) - paidTotal),
+        strong: true,
+      });
+    }
     return {
       profile,
       doc: {
@@ -231,10 +274,8 @@ export async function loadDocument(
         sections: docSections,
         showPrice: q.showPrice,
         amountInWords: q.showPrice ? terbilangRupiah(q.grandTotal ?? "0") : null,
-        totals: [
-          { label: "Subtotal", value: formatIDR(q.subtotal) },
-          { label: "Grand Total", value: formatIDR(q.grandTotal), strong: true },
-        ],
+        totals,
+        paidStamp: paid,
         notes: q.notes,
         terms: q.terms,
         bank: bankOf(await primaryBank()),

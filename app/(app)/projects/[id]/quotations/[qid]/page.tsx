@@ -29,6 +29,7 @@ import { QuotationMetaForm } from "@/components/forms/quotation-meta-form";
 import { paymentTermTypeLabels, quotationStatus } from "@/lib/labels";
 import { toNum } from "@/lib/money";
 import { formatDate, formatIDR } from "@/lib/utils";
+import { projectPayments } from "@/lib/documents";
 import {
   addQuotationSection,
   deletePaymentTerm,
@@ -94,6 +95,9 @@ export default async function QuotationEditorPage({
     .where(eq(invoices.quotationId, qid));
   const invoiceOfTerm = (termId: string) =>
     invoiceRows.find((i) => i.paymentTermId === termId);
+
+  const paid = await projectPayments(id);
+  const paidTotal = paid.reduce((sum, p) => sum + p.value, 0);
 
   const approved = q.status === "approved";
   const editable = q.status === "draft";
@@ -341,6 +345,22 @@ export default async function QuotationEditorPage({
                   {formatIDR(q.grandTotal)}
                 </span>
               </div>
+              {paidTotal > 0 && (
+                <>
+                  <div className="mt-3 -rotate-2 rounded-[8px] border-2 border-double border-success bg-success-soft px-3 py-2 text-center text-success">
+                    <div className="text-[13px] font-extrabold uppercase tracking-widest">Sudah Dibayar</div>
+                    {paid.map((p, i) => (
+                      <div key={i} className="text-[12px] font-medium">
+                        {p.label} · {p.date} · {p.amount}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 flex justify-between text-sm">
+                    <span className="font-medium text-ink">Sisa tagihan</span>
+                    <span className="tabular font-semibold">{formatIDR(grand - paidTotal)}</span>
+                  </div>
+                </>
+              )}
               <div className="mt-2 text-[12px] text-ink-muted">
                 Berlaku s/d {formatDate(q.validUntil)}
               </div>

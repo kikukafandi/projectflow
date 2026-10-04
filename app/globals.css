@@ -132,6 +132,7 @@ a:active > .card-tap {
 .doc-title-block h1 { margin: 0; color: var(--color-ink); font-size: 25px; font-weight: 800; letter-spacing: .045em; line-height: 1; text-transform: uppercase; }
 .doc-number { margin-top: 7px; color: var(--document-accent); font-size: 11px; font-weight: 750; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .doc-status { display: inline-block; margin-top: 8px; border: 1px solid currentColor; border-radius: 2px; padding: 2px 6px; font-size: 8.5px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.doc-paid-stamp { width: fit-content; margin: 14px 0 0 auto; border: 2px double #197248; border-radius: 4px; padding: 6px 12px; color: #197248; font-size: 9.5px; font-weight: 650; text-align: center; transform: rotate(-4deg); break-inside: avoid; }.doc-paid-stamp-title { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .doc-status-neutral { color: #59616d; }.doc-status-positive { color: #197248; }.doc-status-attention { color: #9a6200; }.doc-status-critical { color: #a52e2e; }
 .doc-meta { min-width: 0; margin: 0; font-size: 10px; }
 .doc-meta > div { display: grid; grid-template-columns: minmax(82px, auto) minmax(98px, 1fr); gap: 12px; padding: 1px 0; }

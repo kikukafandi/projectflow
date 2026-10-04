@@ -89,6 +89,10 @@ export function DocumentPaper({
       </table>
 
       {showPrice && <section className="doc-totals"><dl>{doc.totals.map((total) => <div key={total.label} className={total.strong ? "doc-total-strong" : ""}><dt>{total.label}</dt><dd>{total.value}</dd></div>)}</dl></section>}
+      {doc.paidStamp && doc.paidStamp.length > 0 && <section className="doc-paid-stamp">
+        <div className="doc-paid-stamp-title">Sudah Dibayar</div>
+        {doc.paidStamp.map((p, i) => <div key={i}>{p.label} · {p.date} · {p.amount}</div>)}
+      </section>}
       {doc.amountInWords && <p className="doc-words"><span>Terbilang</span>{doc.amountInWords}</p>}
       {doc.bank && <DocumentSection title="Informasi Pembayaran"><p>{doc.bank.bankName} · {doc.bank.accountNumber} · a.n. {doc.bank.accountHolder}</p></DocumentSection>}
       {doc.terms && <DocumentSection title="Syarat & Ketentuan"><p className="whitespace-pre-line">{doc.terms}</p></DocumentSection>}
