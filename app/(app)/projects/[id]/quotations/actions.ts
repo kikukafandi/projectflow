@@ -29,6 +29,40 @@ import {
 
 type Result = { error: string } | void;
 
+/** Copy a RAB's sections + items into a (fresh) quotation. */
+async function copyRabInto(quotationId: string, rabId: string) {
+  const sections = await db
+    .select()
+    .from(rabSections)
+    .where(eq(rabSections.rabId, rabId))
+    .orderBy(asc(rabSections.position));
+  for (const s of sections) {
+    const [qs] = await db
+      .insert(quotationSections)
+      .values({ quotationId, name: s.name, position: s.position })
+      .returning({ id: quotationSections.id });
+    const items = await db
+      .select()
+      .from(rabItems)
+      .where(eq(rabItems.sectionId, s.id))
+      .orderBy(asc(rabItems.position));
+    if (items.length > 0) {
+      await db.insert(quotationItems).values(
+        items.map((it, i) => ({
+          sectionId: qs.id,
+          name: it.name,
+          description: it.description,
+          quantity: it.quantity,
+          unit: it.unit,
+          unitPrice: it.unitPrice,
+          subtotal: it.subtotal,
+          position: i,
+        })),
+      );
+    }
+  }
+}
+
 export async function generateQuotationFromRab(
   projectId: string,
   formData: FormData,
@@ -56,36 +90,7 @@ export async function generateQuotationFromRab(
     })
     .returning({ id: quotations.id });
 
-  const sections = await db
-    .select()
-    .from(rabSections)
-    .where(eq(rabSections.rabId, rabId))
-    .orderBy(asc(rabSections.position));
-  for (const s of sections) {
-    const [qs] = await db
-      .insert(quotationSections)
-      .values({ quotationId: q.id, name: s.name, position: s.position })
-      .returning({ id: quotationSections.id });
-    const items = await db
-      .select()
-      .from(rabItems)
-      .where(eq(rabItems.sectionId, s.id))
-      .orderBy(asc(rabItems.position));
-    if (items.length > 0) {
-      await db.insert(quotationItems).values(
-        items.map((it, i) => ({
-          sectionId: qs.id,
-          name: it.name,
-          description: it.description,
-          quantity: it.quantity,
-          unit: it.unit,
-          unitPrice: it.unitPrice,
-          subtotal: it.subtotal,
-          position: i,
-        })),
-      );
-    }
-  }
+  await copyRabInto(q.id, rabId);
 
   await logActivity({
     userId: user.id,
@@ -175,13 +180,18 @@ export async function setQuotationStatus(
   revalidatePath(`/projects/${projectId}`);
 }
 
+/** Revise into "-R{n}". fromRab: take sections/items/totals from the linked RAB's current state instead of this quotation. */
 export async function reviseQuotation(
   projectId: string,
   qid: string,
+  fromRab = false,
 ): Promise<void> {
   await requireUser();
   const [q] = await db.select().from(quotations).where(eq(quotations.id, qid));
   if (!q) return;
+  const [rab] = fromRab && q.rabId
+    ? await db.select().from(rabs).where(eq(rabs.id, q.rabId))
+    : [];
 
   const base = q.number.replace(/-R\d+$/, "");
   const newVersion = q.currentVersion + 1;
@@ -197,15 +207,16 @@ export async function reviseQuotation(
       showPrice: q.showPrice,
       currentVersion: newVersion,
       validUntil: q.validUntil,
-      subtotal: q.subtotal,
-      grandTotal: q.grandTotal,
+      subtotal: rab ? (rab.subtotal ?? "0") : q.subtotal,
+      grandTotal: rab ? (rab.grandTotal ?? "0") : q.grandTotal,
       notes: q.notes,
       terms: q.terms,
     })
     .returning({ id: quotations.id });
 
+  if (rab) await copyRabInto(nq.id, rab.id);
   // copy sections + items
-  const sections = await db
+  const sections = rab ? [] : await db
     .select()
     .from(quotationSections)
     .where(eq(quotationSections.quotationId, qid))

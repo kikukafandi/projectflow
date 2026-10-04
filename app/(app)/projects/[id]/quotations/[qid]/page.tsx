@@ -135,11 +135,20 @@ export default async function QuotationEditorPage({
                 </Button>
               </form>
             )}
-            <form action={reviseQuotation.bind(null, id, qid)}>
-              <Button type="submit" variant="secondary">
-                <Copy /> Revisi
-              </Button>
-            </form>
+            {q.status !== "revised" && (
+              <form action={reviseQuotation.bind(null, id, qid, false)}>
+                <Button type="submit" variant="secondary">
+                  <Copy /> Revisi
+                </Button>
+              </form>
+            )}
+            {q.status !== "revised" && q.rabId && (
+              <form action={reviseQuotation.bind(null, id, qid, true)}>
+                <Button type="submit" variant="secondary">
+                  <Copy /> Revisi dari RAB
+                </Button>
+              </form>
+            )}
             <form action={deleteQuotation.bind(null, id, qid)}>
               <ConfirmSubmit
                 variant="ghost"
